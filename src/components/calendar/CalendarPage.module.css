@@ -1,0 +1,404 @@
+.root :global(.calendar-panel) {
+    max-width: 780px;
+}
+
+.root :global(.calendar-title) {
+    margin: 7px 0 !important;
+}
+
+.root :global(.month-nav) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.root :global(.month-nav b) {
+    text-transform: capitalize;
+    font-size: 12px;
+    min-width: 115px;
+    text-align: center;
+}
+
+.root :global(.month-nav button) {
+    width: 31px;
+    height: 31px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+}
+
+.root :global(.month-nav button svg) {
+    width: 16px;
+}
+
+.root :global(.calendar-grid) {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin: 21px 0;
+}
+
+.root :global(.weekday) {
+    text-align: center;
+    color: var(--muted);
+    font-size: 10px;
+    padding: 8px;
+}
+
+.root :global(.calendar-day) {
+    height: 48px;
+    background: transparent;
+    border: 0;
+    border-radius: 9px;
+    position: relative;
+    font-size: 12px;
+}
+
+.root :global(.calendar-day:hover),
+.root :global(.calendar-day.selected) {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.root :global(.calendar-day.today) {
+    font-weight: 750;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+.root :global(.calendar-day i) {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    bottom: 6px;
+    left: calc(50% - 2px);
+}
+
+.root :global(.day-heading) {
+    padding-top: 13px;
+    border-top: 1px solid var(--line);
+    margin-bottom: 3px;
+}
+
+@media (max-width: 650px) {
+    .root :global(.calendar-day) {
+        height: 41px;
+    }
+}
+
+@media (max-width: 650px) {
+    .root :global(.weekday) {
+        font-size: 9px;
+        padding: 6px 0;
+    }
+}
+
+@media (max-width: 650px) {
+    .root :global(.month-nav) {
+        gap: 5px;
+    }
+}
+
+@media (max-width: 650px) {
+    .root :global(.month-nav b) {
+        min-width: 105px;
+    }
+}
+
+.root :global(.calendar-report) {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+}
+
+.root :global(.calendar-report-heading) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.root :global(.calendar-report-heading h3) {
+    margin: 5px 0 3px;
+    font-size: 17px;
+}
+
+.root :global(.calendar-report-heading p) {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.root :global(.calendar-report-stats) {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 9px;
+    margin-bottom: 19px;
+}
+
+.root :global(.calendar-report-stats > div) {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--soft);
+}
+
+.root :global(.calendar-report-stats small),
+.root :global(.calendar-report-stats span) {
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.root :global(.calendar-report-stats b) {
+    font-size: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.root :global(.calendar-report-sections) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.root :global(.calendar-report-sections > section) {
+    min-width: 0;
+}
+
+.root :global(.calendar-report-sections h4) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 8px;
+    font-size: 12px;
+}
+
+.root :global(.calendar-report-sections h4 span) {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.root :global(.calendar-report-row) {
+    min-height: 39px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+}
+
+.root :global(.calendar-report-row > i) {
+    width: 8px;
+    height: 20px;
+    flex: 0 0 auto;
+    border-radius: 4px;
+}
+
+.root :global(.calendar-report-row > span) {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.root :global(.calendar-report-row > b) {
+    font-size: 10px;
+    font-weight: 550;
+    color: var(--muted);
+    text-align: right;
+}
+
+.root :global(.calendar-report-empty) {
+    padding: 8px 0;
+    margin: 0;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.root :global(.calendar-report-sections .record-row) {
+    padding: 7px 0;
+}
+
+@media (max-width: 650px) {
+    .root :global(.calendar-report-stats) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+    }
+}
+
+@media (max-width: 650px) {
+    .root :global(.calendar-report-stats > div) {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 650px) {
+    .root :global(.calendar-report-sections) {
+        grid-template-columns: 1fr;
+        gap: 13px;
+    }
+}
+
+@media (max-width: 650px) {
+    .root :global(.calendar-report-heading h3) {
+        font-size: 15px;
+    }
+}
+
+.root :global(.calendar-report-sections > section) {
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel);
+}
+
+.root :global(.calendar-report-sections .calendar-report-stats) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 10px 0 0;
+}
+
+.root :global(.calendar-report-finance-totals) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    padding-top: 10px;
+    margin-top: 8px;
+    border-top: 1px solid var(--line);
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.root :global(.calendar-report-finance-totals b) {
+    margin-left: 4px;
+    color: var(--text);
+}
+
+.root :global(.calendar-report) {
+    margin-left: 21px;
+    margin-right: 21px;
+}
+
+.root :global(.calendar-report-sections) {
+    align-items: stretch;
+    grid-auto-rows: 1fr;
+}
+
+@media (max-width: 650px) {
+    .root :global(.calendar-report) {
+        margin-left: 14px;
+        margin-right: 14px;
+    }
+}
+
+.root :global(.calendar-panel),
+.root :global(.calendar-report) {
+    width: 100%;
+    max-width: 780px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.root :global(.calendar-panel) {
+    max-width: 780px;
+}
+
+.root :global(.calendar-title) {
+    margin: 7px 0 !important;
+}
+
+.root :global(.month-nav) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.root :global(.month-nav b) {
+    text-transform: capitalize;
+    font-size: 12px;
+    min-width: 115px;
+    text-align: center;
+}
+
+.root :global(.month-nav button) {
+    width: 31px;
+    height: 31px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+}
+
+.root :global(.month-nav button svg) {
+    width: 16px;
+}
+
+.root :global(.calendar-grid) {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin: 21px 0;
+}
+
+.root :global(.weekday) {
+    text-align: center;
+    color: var(--muted);
+    font-size: 10px;
+    padding: 8px;
+}
+
+.root :global(.calendar-day) {
+    height: 48px;
+    background: transparent;
+    border: 0;
+    border-radius: 9px;
+    position: relative;
+    font-size: 12px;
+}
+
+.root :global(.calendar-day:hover) {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.root :global(.calendar-day.selected) {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.root :global(.calendar-day i) {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    bottom: 6px;
+    left: calc(50% - 2px);
+}
+
+.root :global(.day-heading) {
+    padding-top: 13px;
+    border-top: 1px solid var(--line);
+    margin-bottom: 3px;
+}
+
+.root :global(.calendar-report) {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+}
+
+.root :global(.calendar-report) {
+    margin-left: 21px;
+    margin-right: 21px;
+}

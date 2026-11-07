@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { money } from "../../domain";
 import { t, type Language } from "../../i18n";
+import styles from "./HomePage.module.css";
 
 interface HomePageProps {
     language: Language;
@@ -44,7 +45,7 @@ export default function HomePage({
     const text = (value: string) => t(value, language);
 
     return (
-        <>
+        <div className={styles.root}>
             <div className="welcome">
                 <div>
                     <div className="eyebrow">{dateLabel}</div>
@@ -126,6 +127,6 @@ export default function HomePage({
                     </div>
                 </section>
             </div>
-        </>
+        </div>
     );
 }

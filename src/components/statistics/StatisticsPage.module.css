@@ -1,0 +1,43 @@
+.root :global(.stats-secondary .summary-card) {
+    height: 100%;
+}
+
+.root :global(.stats-secondary .summary-card > span) {
+    min-height: 2.5em;
+    line-height: 1.25;
+}
+
+.root :global(.stats-secondary .summary-card > small) {
+    margin-top: auto;
+    padding-top: 4px;
+    line-height: 1.3;
+}
+
+.root :global(.stats-secondary) {
+    margin-top: 17px;
+}
+
+@media (max-width: 650px) {
+    .root :global(.stats-secondary) {
+        margin-top: 12px;
+    }
+}
+
+.root :global(.stats-secondary .summary-card) {
+    height: 100%;
+}
+
+.root :global(.stats-secondary .summary-card > span) {
+    min-height: 2.5em;
+    line-height: 1.25;
+}
+
+.root :global(.stats-secondary .summary-card > small) {
+    margin-top: auto;
+    padding-top: 4px;
+    line-height: 1.3;
+}
+
+.root :global(.stats-secondary) {
+    margin-top: 17px;
+}

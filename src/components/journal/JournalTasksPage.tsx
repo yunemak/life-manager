@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Plus } from "lucide-react";
 import { t, type Language } from "../../i18n";
+import styles from "./JournalTasksPage.module.css";
 
 interface JournalTasksPageProps {
     isTasks: boolean;
@@ -20,7 +21,7 @@ export default function JournalTasksPage({
     const text = (value: string) => t(value, language);
 
     return (
-        <>
+        <div className={styles.root}>
             <div className="page-heading">
                 <div>
                     <div className="eyebrow">
@@ -44,6 +45,6 @@ export default function JournalTasksPage({
             <section className={`panel ${isTasks ? "tasks-panel" : ""}`}>
                 {children}
             </section>
-        </>
+        </div>
     );
 }

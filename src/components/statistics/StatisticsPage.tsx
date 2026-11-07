@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { t, type Language } from "../../i18n";
+import styles from "./StatisticsPage.module.css";
 
 interface CategoryTotal {
     id: string;
@@ -53,7 +54,7 @@ export default function StatisticsPage({
     const text = (value: string) => t(value, language);
 
     return (
-        <>
+        <div className={styles.root}>
             <div className="page-heading">
                 <div>
                     <div className="eyebrow">{text("KENDİNİ KEŞFET")}</div>
@@ -119,6 +120,6 @@ export default function StatisticsPage({
                     <small>{text("Günlük aktivitelerin")}</small>
                 </div>
             </div>
-        </>
+        </div>
     );
 }

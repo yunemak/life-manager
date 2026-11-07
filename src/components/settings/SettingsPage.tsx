@@ -109,7 +109,7 @@ export default function SettingsPage({
     const text = (value: string) => t(value, language);
 
     return (
-        <>
+        <div className={styles.root}>
             <div className="page-heading">
                 <div>
                     <div className="eyebrow">{text("SENİN UYGULAMAN")}</div>
@@ -271,6 +271,6 @@ export default function SettingsPage({
                     )}
                 </p>
             </section>
-        </>
+        </div>
     );
 }

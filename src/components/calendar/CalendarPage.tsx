@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import type { Language } from "../../i18n";
+import styles from "./CalendarPage.module.css";
 
 interface CalendarPageProps {
     language: Language;
@@ -42,7 +43,7 @@ export default function CalendarPage({
             : ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 
     return (
-        <>
+        <div className={styles.root}>
             <section className="panel calendar-panel">
                 <div className="panel-heading">
                     <div>
@@ -100,6 +101,6 @@ export default function CalendarPage({
                 </div>
             </section>
             {children}
-        </>
+        </div>
     );
 }
