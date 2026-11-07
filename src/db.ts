@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { Category, Habit, HabitCompletion, JournalEntry, Task, Transaction } from './domain'
+import type { AssetHolding, AssetType, Category, Habit, HabitCompletion, JournalEntry, Task, Transaction } from './domain'
 
 export class LifeDatabase extends Dexie {
   transactions!: EntityTable<Transaction, 'id'>
@@ -8,6 +8,8 @@ export class LifeDatabase extends Dexie {
   habits!: EntityTable<Habit, 'id'>
   completions!: EntityTable<HabitCompletion, 'id'>
   categories!: EntityTable<Category, 'id'>
+  assetHoldings!: EntityTable<AssetHolding, 'id'>
+  assetTypes!: EntityTable<AssetType, 'id'>
   constructor(name = 'life-manager') {
     super(name)
     this.version(1).stores({ transactions: 'id, kind, localDate, occurredAt, categoryId', journal: 'id, kind, localDate, occurredAt, category', tasks: 'id, kind, localDate, dueDate, completed, priority', habits: 'id, title, archived', completions: 'id, habitId, localDate, [habitId+localDate]', categories: 'id, kind, name' })
@@ -25,6 +27,8 @@ export class LifeDatabase extends Dexie {
         completion.status ||= 'completed'
       })
     })
+    this.version(4).stores({ transactions: 'id, kind, localDate, occurredAt, categoryId', journal: 'id, kind, localDate, occurredAt, category', tasks: 'id, kind, localDate, dueDate, completed, priority', habits: 'id, title, archived', completions: 'id, habitId, localDate, [habitId+localDate]', categories: 'id, kind, name', assetHoldings: 'id, assetType, unit, priceCurrency' })
+    this.version(5).stores({ transactions: 'id, kind, localDate, occurredAt, categoryId', journal: 'id, kind, localDate, occurredAt, category', tasks: 'id, kind, localDate, dueDate, completed, priority', habits: 'id, title, archived', completions: 'id, habitId, localDate, [habitId+localDate]', categories: 'id, kind, name', assetHoldings: 'id, assetType, unit, priceCurrency', assetTypes: 'id, name, isDefault' })
   }
 }
 export const db = new LifeDatabase()

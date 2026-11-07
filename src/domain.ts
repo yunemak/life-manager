@@ -8,6 +8,8 @@ export interface HabitFrequency { period: HabitPeriod; target: number; weekdays?
 export interface Habit extends BaseRecord { kind: 'habit'; title: string; schedule: number[]; archived: boolean; description?: string; color?: string; frequency?: HabitFrequency }
 export interface HabitCompletion extends BaseRecord { habitId: string; status?: 'completed' | 'skipped' }
 export interface Category extends BaseRecord { name: string; kind: 'expense' | 'income'; color: string }
+export interface AssetHolding extends BaseRecord { assetType: string; quantity: number; unit: string; location: string; description: string; unitPriceMinor?: number; priceCurrency?: string }
+export interface AssetType { id:string; name:string; isDefault:boolean; createdAt:string; updatedAt:string }
 export type Entry = Transaction | JournalEntry | Task
 export const uid = () => crypto.randomUUID()
 export const localDate = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`

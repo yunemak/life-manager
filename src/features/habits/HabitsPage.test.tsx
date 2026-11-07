@@ -26,6 +26,7 @@ describe('habits experience',()=>{
     const today=new Date(),todayKey=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`
     fireEvent.click(screen.getByRole('button',{name:`Kitap oku, ${todayKey}: Aksadı`}))
     await waitFor(async()=>expect(await db.completions.where({habitId:(await db.habits.toArray())[0].id,localDate:todayKey}).count()).toBe(1))
+    await screen.findByRole('button',{name:`Kitap oku, ${todayKey}: Tamamlandı`})
     fireEvent.click(screen.getByRole('button',{name:'Kitap oku'}))
     expect(await screen.findByText('ALIŞKANLIK DETAYI')).toBeInTheDocument()
     expect(screen.getAllByText('100%')).toHaveLength(2)
