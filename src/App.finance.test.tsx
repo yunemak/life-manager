@@ -1,283 +1,684 @@
 // @vitest-environment jsdom
-import 'fake-indexeddb/auto'
-import '@testing-library/jest-dom/vitest'
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import App from './App'
-import { db } from './db'
-import { localDate } from './domain'
+import "fake-indexeddb/auto";
+import "@testing-library/jest-dom/vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+    cleanup,
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+    within,
+} from "@testing-library/react";
+import App from "./App";
+import { db } from "./db";
+import { localDate } from "./domain";
 
 afterEach(async () => {
-  cleanup()
-  localStorage.clear()
-  vi.restoreAllMocks()
-  await db.delete()
-  await db.open()
-})
+    cleanup();
+    localStorage.clear();
+    vi.restoreAllMocks();
+    await db.delete();
+    await db.open();
+});
 
-describe('finance workflow', () => {
-  it('creates expense and income, reflects real totals, edits and deletes records', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
-    render(<App />)
+describe("finance workflow", () => {
+    it("creates expense and income, reflects real totals, edits and deletes records", async () => {
+        vi.spyOn(window, "confirm").mockReturnValue(true);
+        render(<App />);
 
-    await screen.findByText('Merhaba 👋')
+        await screen.findByText("Merhaba 👋");
 
-    // Record an expense using quick entry.
-    fireEvent.click(screen.getByRole('button', { name: 'Hızlı kayıt ekle' }))
-    const expenseDialog = screen.getByRole('dialog')
-    fireEvent.change(within(expenseDialog).getByLabelText(/Tutar/), { target: { value: '125.50' } })
-    fireEvent.change(within(expenseDialog).getByLabelText(/Açıklama/), { target: { value: 'Test market alışverişi' } })
-    fireEvent.click(within(expenseDialog).getByRole('button', { name: /Kaydet/ }))
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+        // Record an expense using quick entry.
+        fireEvent.click(
+            screen.getByRole("button", { name: "Hızlı kayıt ekle" }),
+        );
+        const expenseDialog = screen.getByRole("dialog");
+        fireEvent.change(within(expenseDialog).getByLabelText(/Tutar/), {
+            target: { value: "125.50" },
+        });
+        fireEvent.change(within(expenseDialog).getByLabelText(/Açıklama/), {
+            target: { value: "Test market alışverişi" },
+        });
+        fireEvent.click(
+            within(expenseDialog).getByRole("button", { name: /Kaydet/ }),
+        );
+        await waitFor(() =>
+            expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+        );
 
-    // Add income through the same quick-entry sheet.
-    fireEvent.click(screen.getByRole('button', { name: 'Hızlı kayıt ekle' }))
-    const incomeDialog = screen.getByRole('dialog')
-    fireEvent.click(within(incomeDialog).getByRole('button', { name: 'Gelir' }))
-    fireEvent.change(within(incomeDialog).getByLabelText(/Tutar/), { target: { value: '2500' } })
-    fireEvent.change(within(incomeDialog).getByLabelText(/Açıklama/), { target: { value: 'Test gelir' } })
-    fireEvent.click(within(incomeDialog).getByRole('button', { name: /Kaydet/ }))
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+        // Add income through the same quick-entry sheet.
+        fireEvent.click(
+            screen.getByRole("button", { name: "Hızlı kayıt ekle" }),
+        );
+        const incomeDialog = screen.getByRole("dialog");
+        fireEvent.click(
+            within(incomeDialog).getByRole("button", { name: "Gelir" }),
+        );
+        fireEvent.change(within(incomeDialog).getByLabelText(/Tutar/), {
+            target: { value: "2500" },
+        });
+        fireEvent.change(within(incomeDialog).getByLabelText(/Açıklama/), {
+            target: { value: "Test gelir" },
+        });
+        fireEvent.click(
+            within(incomeDialog).getByRole("button", { name: /Kaydet/ }),
+        );
+        await waitFor(() =>
+            expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+        );
 
-    // Finance totals and transaction history are derived from IndexedDB records.
-    fireEvent.click(screen.getAllByRole('button', { name: 'Finans' })[0])
-    expect(await screen.findByText('Test market alışverişi')).toBeInTheDocument()
-    expect(screen.getByText('Test gelir')).toBeInTheDocument()
-    expect(screen.getAllByText('₺125,50').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('₺2.500,00').length).toBeGreaterThan(0)
+        // Finance totals and transaction history are derived from IndexedDB records.
+        fireEvent.click(screen.getAllByRole("button", { name: "Finans" })[0]);
+        expect(
+            await screen.findByText("Test market alışverişi"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("Test gelir")).toBeInTheDocument();
+        expect(screen.getAllByText("₺125,50").length).toBeGreaterThan(0);
+        expect(screen.getAllByText("₺2.500,00").length).toBeGreaterThan(0);
 
-    // Edit the expense and confirm that the changed value is shown.
-    fireEvent.click(screen.getByRole('button', { name: /Test market alışverişi/ }))
-    const editDialog = screen.getByRole('dialog')
-    const amount = within(editDialog).getByLabelText(/Tutar/)
-    fireEvent.change(amount, { target: { value: '200' } })
-    fireEvent.click(within(editDialog).getByRole('button', { name: /Değişiklikleri kaydet/ }))
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
-    expect((await screen.findAllByText('₺200,00')).length).toBeGreaterThan(0)
+        // Edit the expense and confirm that the changed value is shown.
+        fireEvent.click(
+            screen.getByRole("button", { name: /Test market alışverişi/ }),
+        );
+        const editDialog = screen.getByRole("dialog");
+        const amount = within(editDialog).getByLabelText(/Tutar/);
+        fireEvent.change(amount, { target: { value: "200" } });
+        fireEvent.click(
+            within(editDialog).getByRole("button", {
+                name: /Değişiklikleri kaydet/,
+            }),
+        );
+        await waitFor(() =>
+            expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+        );
+        expect((await screen.findAllByText("₺200,00")).length).toBeGreaterThan(
+            0,
+        );
 
-    // Delete the edited record and ensure it no longer appears in finance history.
-    const expenseRow = screen.getByText('Test market alışverişi').closest('.record-row')
-    expect(expenseRow).not.toBeNull()
-    fireEvent.click(within(expenseRow as HTMLElement).getByRole('button', { name: 'Kaydı sil' }))
-    const deleteDialog=screen.getByRole('alertdialog')
-    expect(within(deleteDialog).getByText('Bu kaydı silmek istediğinize emin misiniz?')).toBeInTheDocument()
-    fireEvent.click(within(deleteDialog).getByRole('button',{name:'Vazgeç'}))
-    expect(screen.getByText('Test market alışverişi')).toBeInTheDocument()
-    fireEvent.click(within(screen.getByText('Test market alışverişi').closest('.record-row') as HTMLElement).getByRole('button',{name:'Kaydı sil'}))
-    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button',{name:'Sil'}))
-    await waitFor(() => expect(screen.queryByText('Test market alışverişi')).not.toBeInTheDocument())
-    expect(window.confirm).not.toHaveBeenCalled()
-    expect(await db.transactions.count()).toBe(1)
-  })
+        // Delete the edited record and ensure it no longer appears in finance history.
+        const expenseRow = screen
+            .getByText("Test market alışverişi")
+            .closest(".record-row");
+        expect(expenseRow).not.toBeNull();
+        fireEvent.click(
+            within(expenseRow as HTMLElement).getByRole("button", {
+                name: "Kaydı sil",
+            }),
+        );
+        const deleteDialog = screen.getByRole("alertdialog");
+        expect(
+            within(deleteDialog).getByText(
+                "Bu kaydı silmek istediğinize emin misiniz?",
+            ),
+        ).toBeInTheDocument();
+        fireEvent.click(
+            within(deleteDialog).getByRole("button", { name: "Vazgeç" }),
+        );
+        expect(screen.getByText("Test market alışverişi")).toBeInTheDocument();
+        fireEvent.click(
+            within(
+                screen
+                    .getByText("Test market alışverişi")
+                    .closest(".record-row") as HTMLElement,
+            ).getByRole("button", { name: "Kaydı sil" }),
+        );
+        fireEvent.click(
+            within(screen.getByRole("alertdialog")).getByRole("button", {
+                name: "Sil",
+            }),
+        );
+        await waitFor(() =>
+            expect(
+                screen.queryByText("Test market alışverişi"),
+            ).not.toBeInTheDocument(),
+        );
+        expect(window.confirm).not.toHaveBeenCalled();
+        expect(await db.transactions.count()).toBe(1);
+    });
 
-  it('shows income, expenses, net balance and income categories in statistics', async () => {
-    const today = localDate()
-    const timestamp = new Date().toISOString()
-    await db.categories.add({ id:'salary', name:'Maaş', kind:'income', color:'#51a989', localDate:today, createdAt:timestamp, updatedAt:timestamp })
-    await db.categories.add({ id:'food', name:'Yemek', kind:'expense', color:'#ec9a55', localDate:today, createdAt:timestamp, updatedAt:timestamp })
-    await db.transactions.bulkAdd([
-      { id:'income-stat', kind:'income', amountMinor:350000, categoryId:'salary', description:'Aylık maaş', occurredAt:`${today}T09:00`, localDate:today, createdAt:timestamp, updatedAt:timestamp },
-      { id:'expense-stat', kind:'expense', amountMinor:87500, categoryId:'food', description:'Market', occurredAt:`${today}T10:00`, localDate:today, createdAt:timestamp, updatedAt:timestamp },
-    ])
-    render(<App />)
-    await screen.findByText('Merhaba 👋')
-    fireEvent.click(screen.getByRole('button', { name:'Daha' }))
-    fireEvent.click(screen.getAllByRole('button', { name:'İstatistikler' }).at(-1)!)
+    it("shows income, expenses, net balance and income categories in statistics", async () => {
+        const today = localDate();
+        const timestamp = new Date().toISOString();
+        await db.categories.add({
+            id: "salary",
+            name: "Maaş",
+            kind: "income",
+            color: "#51a989",
+            localDate: today,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+        });
+        await db.categories.add({
+            id: "food",
+            name: "Yemek",
+            kind: "expense",
+            color: "#ec9a55",
+            localDate: today,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+        });
+        await db.transactions.bulkAdd([
+            {
+                id: "income-stat",
+                kind: "income",
+                amountMinor: 350000,
+                categoryId: "salary",
+                description: "Aylık maaş",
+                occurredAt: `${today}T09:00`,
+                localDate: today,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            },
+            {
+                id: "expense-stat",
+                kind: "expense",
+                amountMinor: 87500,
+                categoryId: "food",
+                description: "Market",
+                occurredAt: `${today}T10:00`,
+                localDate: today,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            },
+        ]);
+        render(<App />);
+        await screen.findByText("Merhaba 👋");
+        fireEvent.click(screen.getByRole("button", { name: "Daha" }));
+        fireEvent.click(
+            screen.getAllByRole("button", { name: "İstatistikler" }).at(-1)!,
+        );
 
-    expect(await screen.findByText('Gelir kategorileri')).toBeInTheDocument()
-    expect(screen.getByText('Maaş')).toBeInTheDocument()
-    expect(screen.getByText('Yemek')).toBeInTheDocument()
-    expect(screen.getAllByText('₺3.500,00').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('₺875,00').length).toBeGreaterThan(0)
-    expect(screen.getByText('₺2.625,00')).toBeInTheDocument()
-  })
+        expect(
+            await screen.findByText("Gelir kategorileri"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("Maaş")).toBeInTheDocument();
+        expect(screen.getByText("Yemek")).toBeInTheDocument();
+        expect(screen.getAllByText("₺3.500,00").length).toBeGreaterThan(0);
+        expect(screen.getAllByText("₺875,00").length).toBeGreaterThan(0);
+        expect(screen.getByText("₺2.625,00")).toBeInTheDocument();
+    });
 
-  it('lets me mark a task complete and undo completion from the Tasks screen', async () => {
-    const today = localDate()
-    const timestamp = new Date().toISOString()
-    await db.tasks.add({ id:'task-completion', kind:'task', title:'Send the report', dueDate:today, priority:'high', completed:false, localDate:today, createdAt:timestamp, updatedAt:timestamp })
-    render(<App />)
-    await screen.findByText('Merhaba 👋')
-    fireEvent.click(screen.getAllByRole('button', { name:'Görevler' })[0])
+    it("lets me mark a task complete and undo completion from the Tasks screen", async () => {
+        const today = localDate();
+        const timestamp = new Date().toISOString();
+        await db.tasks.add({
+            id: "task-completion",
+            kind: "task",
+            title: "Send the report",
+            dueDate: today,
+            priority: "high",
+            completed: false,
+            localDate: today,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+        });
+        render(<App />);
+        await screen.findByText("Merhaba 👋");
+        fireEvent.click(screen.getAllByRole("button", { name: "Görevler" })[0]);
 
-    const completeButton = await screen.findByRole('button', { name:'Görevi tamamla' })
-    expect(screen.getByText('Send the report').closest('.record-row')).toHaveClass('task-priority-high')
-    expect(completeButton.closest('.tasks-panel')).toBeInTheDocument()
-    fireEvent.click(screen.getByText('Send the report'))
-    await waitFor(async () => expect((await db.tasks.get('task-completion'))?.completed).toBe(true))
-    await waitFor(() => expect(screen.getByText('Send the report').closest('.record-row')).toHaveClass('task-completed'))
-    fireEvent.click(screen.getByText('Send the report'))
-    await waitFor(async () => expect((await db.tasks.get('task-completion'))?.completed).toBe(false))
-    await waitFor(() => expect(screen.getByRole('button', { name:'Görevi tamamla' })).toBeInTheDocument())
-    fireEvent.click(screen.getByRole('button', { name:'Görevi düzenle: Send the report' }))
-    const editDialog=screen.getByRole('dialog')
-    expect(editDialog).toBeInTheDocument()
-    expect(Array.from(editDialog.querySelectorAll('.type-tabs button')).map(button=>button.textContent)).toEqual(['Görev'])
-    fireEvent.click(within(editDialog).getByRole('button', { name:'Kapat' }))
+        const completeButton = await screen.findByRole("button", {
+            name: "Görevi tamamla",
+        });
+        expect(
+            screen.getByText("Send the report").closest(".record-row"),
+        ).toHaveClass("task-priority-high");
+        expect(completeButton.closest(".tasks-panel")).toBeInTheDocument();
+        fireEvent.click(screen.getByText("Send the report"));
+        await waitFor(async () =>
+            expect((await db.tasks.get("task-completion"))?.completed).toBe(
+                true,
+            ),
+        );
+        await waitFor(() =>
+            expect(
+                screen.getByText("Send the report").closest(".record-row"),
+            ).toHaveClass("task-completed"),
+        );
+        fireEvent.click(screen.getByText("Send the report"));
+        await waitFor(async () =>
+            expect((await db.tasks.get("task-completion"))?.completed).toBe(
+                false,
+            ),
+        );
+        await waitFor(() =>
+            expect(
+                screen.getByRole("button", { name: "Görevi tamamla" }),
+            ).toBeInTheDocument(),
+        );
+        fireEvent.click(
+            screen.getByRole("button", {
+                name: "Görevi düzenle: Send the report",
+            }),
+        );
+        const editDialog = screen.getByRole("dialog");
+        expect(editDialog).toBeInTheDocument();
+        expect(
+            Array.from(editDialog.querySelectorAll(".type-tabs button")).map(
+                (button) => button.textContent,
+            ),
+        ).toEqual(["Görev"]);
+        fireEvent.click(
+            within(editDialog).getByRole("button", { name: "Kapat" }),
+        );
 
-    fireEvent.click(screen.getByRole('button', { name:'Görevi tamamla' }))
-    await waitFor(async () => expect((await db.tasks.get('task-completion'))?.completed).toBe(true))
-    await waitFor(() => expect(screen.getByRole('button', { name:'Tamamlandı işaretini kaldır' })).toHaveAttribute('aria-pressed', 'true'))
+        fireEvent.click(screen.getByRole("button", { name: "Görevi tamamla" }));
+        await waitFor(async () =>
+            expect((await db.tasks.get("task-completion"))?.completed).toBe(
+                true,
+            ),
+        );
+        await waitFor(() =>
+            expect(
+                screen.getByRole("button", {
+                    name: "Tamamlandı işaretini kaldır",
+                }),
+            ).toHaveAttribute("aria-pressed", "true"),
+        );
 
-    fireEvent.click(screen.getByRole('button', { name:'Tamamlandı işaretini kaldır' }))
-    await waitFor(async () => expect((await db.tasks.get('task-completion'))?.completed).toBe(false))
-    await waitFor(() => expect(screen.getByRole('button', { name:'Görevi tamamla' })).toHaveAttribute('aria-pressed', 'false'))
-  })
+        fireEvent.click(
+            screen.getByRole("button", { name: "Tamamlandı işaretini kaldır" }),
+        );
+        await waitFor(async () =>
+            expect((await db.tasks.get("task-completion"))?.completed).toBe(
+                false,
+            ),
+        );
+        await waitFor(() =>
+            expect(
+                screen.getByRole("button", { name: "Görevi tamamla" }),
+            ).toHaveAttribute("aria-pressed", "false"),
+        );
+    });
 
-  it('opens all of today’s entries with timestamps from the overview link in English', async () => {
-    const today=localDate(),timestamp=new Date().toISOString()
-    await db.transactions.bulkAdd(Array.from({length:6},(_,index)=>({id:`today-entry-${index}`,kind:'expense' as const,amountMinor:1000,categoryId:'food',description:`Today entry ${index+1}`,occurredAt:`${today}T08:${String(10+index)}:00`,localDate:today,createdAt:timestamp,updatedAt:timestamp})))
-    render(<App />)
-    await screen.findByText('Merhaba 👋')
-    await screen.findByText('Today entry 1')
-    fireEvent.click(screen.getByRole('button',{name:'Switch language to English'}))
-    const viewAll=await screen.findByRole('button',{name:'View all'})
-    fireEvent.click(viewAll)
-    expect(await screen.findByRole('heading',{name:"Today's entries"})).toBeInTheDocument()
-    const entriesHeading=screen.getByRole('heading',{name:"Today's entries"})
-    expect(entriesHeading.closest('header')).toContainElement(screen.getByRole('button',{name:'Back to overview'}))
-    expect(screen.getByText(/entries for today/)).toBeInTheDocument()
-    for(let i=1;i<=6;i++)expect(screen.getByText(`Today entry ${i}`)).toBeInTheDocument()
-    expect(screen.getByText(/08:10/)).toBeInTheDocument()
-    expect(screen.getByText(/08:15/)).toBeInTheDocument()
-  })
+    it("opens all of today’s entries with timestamps from the overview link in English", async () => {
+        const today = localDate(),
+            timestamp = new Date().toISOString();
+        await db.transactions.bulkAdd(
+            Array.from({ length: 6 }, (_, index) => ({
+                id: `today-entry-${index}`,
+                kind: "expense" as const,
+                amountMinor: 1000,
+                categoryId: "food",
+                description: `Today entry ${index + 1}`,
+                occurredAt: `${today}T08:${String(10 + index)}:00`,
+                localDate: today,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            })),
+        );
+        render(<App />);
+        await screen.findByText("Merhaba 👋");
+        await screen.findByText("Today entry 1");
+        fireEvent.click(
+            screen.getByRole("button", { name: "Switch language to English" }),
+        );
+        const viewAll = await screen.findByRole("button", { name: "View all" });
+        fireEvent.click(viewAll);
+        expect(
+            await screen.findByRole("heading", { name: "Today's entries" }),
+        ).toBeInTheDocument();
+        const entriesHeading = screen.getByRole("heading", {
+            name: "Today's entries",
+        });
+        expect(entriesHeading.closest("header")).toContainElement(
+            screen.getByRole("button", { name: "Back to overview" }),
+        );
+        expect(screen.getByText(/entries for today/)).toBeInTheDocument();
+        for (let i = 1; i <= 6; i++)
+            expect(screen.getByText(`Today entry ${i}`)).toBeInTheDocument();
+        expect(screen.getByText(/08:10/)).toBeInTheDocument();
+        expect(screen.getByText(/08:15/)).toBeInTheDocument();
+    });
 
-  it('toggles a task directly from Recent entries and reflects completion immediately', async () => {
-    const today=localDate(),timestamp=new Date().toISOString()
-    await db.tasks.add({id:'recent-task',kind:'task',title:'Water the plants',dueDate:today,priority:'medium',completed:false,localDate:today,createdAt:timestamp,updatedAt:timestamp})
-    render(<App />)
-    await screen.findByText('Merhaba 👋')
-    const panel=screen.getByText('Son kayıtlar').closest('.recent-entries-panel') as HTMLElement
-    const title=await within(panel).findByText('Water the plants')
-    expect(title.closest('.recent-entries-panel')).toBeInTheDocument()
-    expect(title.closest('.record-row')).toHaveClass('task-priority-medium')
-    const incompleteCheck=within(panel).getByRole('button',{name:'Görevi tamamla'})
-    expect(incompleteCheck).not.toHaveClass('checked')
-    expect(incompleteCheck).toBeEmptyDOMElement()
-    fireEvent.click(title)
-    await waitFor(async()=>expect((await db.tasks.get('recent-task'))?.completed).toBe(true))
-    await waitFor(()=>expect(within(panel).getByText('Water the plants').closest('.record-row')).toHaveClass('task-completed'))
-    expect(within(panel).getByRole('button',{name:'Tamamlandı işaretini kaldır'})).toHaveClass('checked')
-    expect(within(panel).getByRole('button',{name:'Tamamlandı işaretini kaldır'})).toHaveAttribute('aria-pressed','true')
-    fireEvent.click(screen.getByRole('button',{name:'Tümünü gör'}))
-    const dayTask=await screen.findByText('Water the plants')
-    expect(dayTask.closest('.record-row')).toHaveClass('task-priority-medium','task-completed')
-    expect(screen.getByRole('button',{name:'Tamamlandı işaretini kaldır'})).toHaveClass('checked')
-    expect(screen.getByRole('button',{name:'Tamamlandı işaretini kaldır'})).toHaveAttribute('aria-pressed','true')
-  })
+    it("toggles a task directly from Recent entries and reflects completion immediately", async () => {
+        const today = localDate(),
+            timestamp = new Date().toISOString();
+        await db.tasks.add({
+            id: "recent-task",
+            kind: "task",
+            title: "Water the plants",
+            dueDate: today,
+            priority: "medium",
+            completed: false,
+            localDate: today,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+        });
+        render(<App />);
+        await screen.findByText("Merhaba 👋");
+        const panel = screen
+            .getByText("Son kayıtlar")
+            .closest(".recent-entries-panel") as HTMLElement;
+        const title = await within(panel).findByText("Water the plants");
+        expect(title.closest(".recent-entries-panel")).toBeInTheDocument();
+        expect(title.closest(".record-row")).toHaveClass(
+            "task-priority-medium",
+        );
+        const incompleteCheck = within(panel).getByRole("button", {
+            name: "Görevi tamamla",
+        });
+        expect(incompleteCheck).not.toHaveClass("checked");
+        expect(incompleteCheck).toBeEmptyDOMElement();
+        fireEvent.click(title);
+        await waitFor(async () =>
+            expect((await db.tasks.get("recent-task"))?.completed).toBe(true),
+        );
+        await waitFor(() =>
+            expect(
+                within(panel)
+                    .getByText("Water the plants")
+                    .closest(".record-row"),
+            ).toHaveClass("task-completed"),
+        );
+        expect(
+            within(panel).getByRole("button", {
+                name: "Tamamlandı işaretini kaldır",
+            }),
+        ).toHaveClass("checked");
+        expect(
+            within(panel).getByRole("button", {
+                name: "Tamamlandı işaretini kaldır",
+            }),
+        ).toHaveAttribute("aria-pressed", "true");
+        fireEvent.click(screen.getByRole("button", { name: "Tümünü gör" }));
+        const dayTask = await screen.findByText("Water the plants");
+        expect(dayTask.closest(".record-row")).toHaveClass(
+            "task-priority-medium",
+            "task-completed",
+        );
+        expect(
+            screen.getByRole("button", { name: "Tamamlandı işaretini kaldır" }),
+        ).toHaveClass("checked");
+        expect(
+            screen.getByRole("button", { name: "Tamamlandı işaretini kaldır" }),
+        ).toHaveAttribute("aria-pressed", "true");
+    });
 
-  it('shows a selected-day report with its finance, task, journal, and habit details', async () => {
-    const yesterdayDate=new Date();yesterdayDate.setDate(yesterdayDate.getDate()-1)
-    const yesterday=localDate(yesterdayDate),timestamp=new Date().toISOString()
-    await db.transactions.add({id:'report-expense',kind:'expense',amountMinor:1234,categoryId:'food',description:'Coffee',occurredAt:`${yesterday}T09:00`,localDate:yesterday,createdAt:timestamp,updatedAt:timestamp})
-    await db.tasks.add({id:'report-task',kind:'task',title:'Call family',dueDate:yesterday,priority:'medium',completed:true,localDate:yesterday,createdAt:timestamp,updatedAt:timestamp})
-    await db.journal.add({id:'report-note',kind:'note',title:'A good day',body:'',category:'',occurredAt:`${yesterday}T12:00`,localDate:yesterday,createdAt:timestamp,updatedAt:timestamp})
-    await db.habits.add({id:'report-habit',kind:'habit',title:'Walk',schedule:[0,1,2,3,4,5,6],archived:false,localDate:yesterday,createdAt:timestamp,updatedAt:timestamp})
-    await db.completions.add({id:'report-habit-done',habitId:'report-habit',localDate:yesterday,createdAt:timestamp,updatedAt:timestamp})
+    it("shows a selected-day report with its finance, task, journal, and habit details", async () => {
+        const yesterdayDate = new Date();
+        yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+        const yesterday = localDate(yesterdayDate),
+            timestamp = new Date().toISOString();
+        await db.transactions.add({
+            id: "report-expense",
+            kind: "expense",
+            amountMinor: 1234,
+            categoryId: "food",
+            description: "Coffee",
+            occurredAt: `${yesterday}T09:00`,
+            localDate: yesterday,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+        });
+        await db.tasks.add({
+            id: "report-task",
+            kind: "task",
+            title: "Call family",
+            dueDate: yesterday,
+            priority: "medium",
+            completed: true,
+            localDate: yesterday,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+        });
+        await db.journal.add({
+            id: "report-note",
+            kind: "note",
+            title: "A good day",
+            body: "",
+            category: "",
+            occurredAt: `${yesterday}T12:00`,
+            localDate: yesterday,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+        });
+        await db.habits.add({
+            id: "report-habit",
+            kind: "habit",
+            title: "Walk",
+            schedule: [0, 1, 2, 3, 4, 5, 6],
+            archived: false,
+            localDate: yesterday,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+        });
+        await db.completions.add({
+            id: "report-habit-done",
+            habitId: "report-habit",
+            localDate: yesterday,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+        });
 
-    const {container}=render(<App />)
-    await screen.findByText('Merhaba 👋')
-    fireEvent.click(screen.getAllByRole('button',{name:'Takvim'})[0])
-    await screen.findByText('GÜNLÜK RAPOR')
-    const calendarPanel=container.querySelector<HTMLElement>('.calendar-panel')
-    const dailyReport=container.querySelector<HTMLElement>('.calendar-report')
-    expect(calendarPanel).not.toBeNull()
-    expect(dailyReport).not.toBeNull()
-    expect(calendarPanel).not.toContainElement(dailyReport)
-    const dateButton=Array.from(container.querySelectorAll('.calendar-day')).find(button=>button.textContent?.trim()===String(Number(yesterday.slice(-2))))
-    expect(dateButton).not.toBeNull()
-    fireEvent.click(dateButton!)
-    expect(await screen.findByText('Coffee')).toBeInTheDocument()
-    expect(screen.getAllByText('Call family').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('A good day').length).toBeGreaterThan(0)
-    expect(screen.getByText('Walk')).toBeInTheDocument()
-    expect(screen.getAllByText('₺12,34').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('1/1').length).toBeGreaterThan(0)
-    fireEvent.click(container.querySelector('.calendar-day')!)
-    await waitFor(()=>expect(screen.queryByText('Coffee')).not.toBeInTheDocument())
-  })
+        const { container } = render(<App />);
+        await screen.findByText("Merhaba 👋");
+        fireEvent.click(screen.getAllByRole("button", { name: "Takvim" })[0]);
+        await screen.findByText("GÜNLÜK RAPOR");
+        const calendarPanel =
+            container.querySelector<HTMLElement>(".calendar-panel");
+        const dailyReport =
+            container.querySelector<HTMLElement>(".calendar-report");
+        expect(calendarPanel).not.toBeNull();
+        expect(dailyReport).not.toBeNull();
+        expect(calendarPanel).not.toContainElement(dailyReport);
+        const dateButton = Array.from(
+            container.querySelectorAll(".calendar-day"),
+        ).find(
+            (button) =>
+                button.textContent?.trim() ===
+                String(Number(yesterday.slice(-2))),
+        );
+        expect(dateButton).not.toBeNull();
+        fireEvent.click(dateButton!);
+        expect(await screen.findByText("Coffee")).toBeInTheDocument();
+        expect(screen.getAllByText("Call family").length).toBeGreaterThan(0);
+        expect(screen.getAllByText("A good day").length).toBeGreaterThan(0);
+        expect(screen.getByText("Walk")).toBeInTheDocument();
+        expect(screen.getAllByText("₺12,34").length).toBeGreaterThan(0);
+        expect(screen.getAllByText("1/1").length).toBeGreaterThan(0);
+        fireEvent.click(container.querySelector(".calendar-day")!);
+        await waitFor(() =>
+            expect(screen.queryByText("Coffee")).not.toBeInTheDocument(),
+        );
+    });
 
-  it('translates the finance, journal, tasks, habits, and statistics sections to English', async () => {
-    const today=localDate(),timestamp=new Date().toISOString()
-    await db.categories.bulkAdd([
-      {id:'test-food',name:'Yemek',kind:'expense',color:'#ec9a55',localDate:today,createdAt:timestamp,updatedAt:timestamp},
-      {id:'test-transport',name:'Ulaşım',kind:'expense',color:'#51a989',localDate:today,createdAt:timestamp,updatedAt:timestamp},
-    ])
-    const {container}=render(<App />)
-    await screen.findByText('Merhaba 👋')
-    fireEvent.click(screen.getByRole('button',{name:'Switch language to English'}))
-    const bottomNav=within(container.querySelector('.bottom-nav') as HTMLElement)
-    expect(bottomNav.getByText('Overview')).toBeInTheDocument()
-    expect(bottomNav.getByText('Finance')).toBeInTheDocument()
-    expect(bottomNav.getByText('Calendar')).toBeInTheDocument()
-    expect(bottomNav.getByText('Journal')).toBeInTheDocument()
-    expect(bottomNav.getByText('More')).toBeInTheDocument()
+    it("translates the finance, journal, tasks, habits, and statistics sections to English", async () => {
+        const today = localDate(),
+            timestamp = new Date().toISOString();
+        await db.categories.bulkAdd([
+            {
+                id: "test-food",
+                name: "Yemek",
+                kind: "expense",
+                color: "#ec9a55",
+                localDate: today,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            },
+            {
+                id: "test-transport",
+                name: "Ulaşım",
+                kind: "expense",
+                color: "#51a989",
+                localDate: today,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            },
+        ]);
+        const { container } = render(<App />);
+        await screen.findByText("Merhaba 👋");
+        fireEvent.click(
+            screen.getByRole("button", { name: "Switch language to English" }),
+        );
+        const bottomNav = within(
+            container.querySelector(".bottom-nav") as HTMLElement,
+        );
+        expect(bottomNav.getByText("Overview")).toBeInTheDocument();
+        expect(bottomNav.getByText("Finance")).toBeInTheDocument();
+        expect(bottomNav.getByText("Calendar")).toBeInTheDocument();
+        expect(bottomNav.getByText("Journal")).toBeInTheDocument();
+        expect(bottomNav.getByText("More")).toBeInTheDocument();
 
-    fireEvent.click(bottomNav.getByText('Finance'))
-    expect(await screen.findByRole('heading',{name:'Finance'})).toBeInTheDocument()
-    expect(screen.getByText('Take control of your money')).toBeInTheDocument()
-    expect(screen.getByText('Expenses this month')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button',{name:'Add quick entry'}))
-    let quickDialog=screen.getByRole('dialog')
-    expect(Array.from(quickDialog.querySelectorAll('.type-tabs button')).map(button=>button.textContent)).toEqual(['Expense','Income'])
-    fireEvent.click(within(quickDialog).getByRole('button',{name:'Close'}))
-    fireEvent.click(screen.getByRole('button',{name:'Add transaction'}))
-    const financeDialog=screen.getByRole('dialog')
-    expect(within(financeDialog).getByRole('option',{name:'Food'})).toBeInTheDocument()
-    expect(within(financeDialog).getByRole('option',{name:'Transport'})).toBeInTheDocument()
-    fireEvent.click(within(financeDialog).getByRole('button',{name:'Close'}))
+        fireEvent.click(bottomNav.getByText("Finance"));
+        expect(
+            await screen.findByRole("heading", { name: "Finance" }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText("Take control of your money"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("Expenses this month")).toBeInTheDocument();
+        fireEvent.click(
+            screen.getByRole("button", { name: "Add quick entry" }),
+        );
+        let quickDialog = screen.getByRole("dialog");
+        expect(
+            Array.from(quickDialog.querySelectorAll(".type-tabs button")).map(
+                (button) => button.textContent,
+            ),
+        ).toEqual(["Expense", "Income"]);
+        fireEvent.click(
+            within(quickDialog).getByRole("button", { name: "Close" }),
+        );
+        fireEvent.click(
+            screen.getByRole("button", { name: "Add transaction" }),
+        );
+        const financeDialog = screen.getByRole("dialog");
+        expect(
+            within(financeDialog).getByRole("option", { name: "Food" }),
+        ).toBeInTheDocument();
+        expect(
+            within(financeDialog).getByRole("option", { name: "Transport" }),
+        ).toBeInTheDocument();
+        fireEvent.click(
+            within(financeDialog).getByRole("button", { name: "Close" }),
+        );
 
-    fireEvent.click(bottomNav.getByText('Journal'))
-    expect(await screen.findByRole('heading',{name:'Journal'})).toBeInTheDocument()
-    expect(screen.getByText('YOUR DAILY LIFE')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button',{name:'Add quick entry'}))
-    quickDialog=screen.getByRole('dialog')
-    expect(Array.from(quickDialog.querySelectorAll('.type-tabs button')).map(button=>button.textContent)).toEqual(['Activity','Note'])
-    fireEvent.click(within(quickDialog).getByRole('button',{name:'Close'}))
+        fireEvent.click(bottomNav.getByText("Journal"));
+        expect(
+            await screen.findByRole("heading", { name: "Journal" }),
+        ).toBeInTheDocument();
+        expect(screen.getByText("YOUR DAILY LIFE")).toBeInTheDocument();
+        fireEvent.click(
+            screen.getByRole("button", { name: "Add quick entry" }),
+        );
+        quickDialog = screen.getByRole("dialog");
+        expect(
+            Array.from(quickDialog.querySelectorAll(".type-tabs button")).map(
+                (button) => button.textContent,
+            ),
+        ).toEqual(["Activity", "Note"]);
+        fireEvent.click(
+            within(quickDialog).getByRole("button", { name: "Close" }),
+        );
 
-    fireEvent.click(screen.getByRole('button',{name:'Tasks'}))
-    expect(await screen.findByRole('heading',{name:'Tasks'})).toBeInTheDocument()
-    expect(screen.getByText('PLAN WHAT’S ON YOUR MIND')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button',{name:'Add quick entry'}))
-    quickDialog=screen.getByRole('dialog')
-    expect(Array.from(quickDialog.querySelectorAll('.type-tabs button')).map(button=>button.textContent)).toEqual(['Task'])
-    fireEvent.click(within(quickDialog).getByRole('button',{name:'Close'}))
+        fireEvent.click(screen.getByRole("button", { name: "Tasks" }));
+        expect(
+            await screen.findByRole("heading", { name: "Tasks" }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText("PLAN WHAT’S ON YOUR MIND"),
+        ).toBeInTheDocument();
+        fireEvent.click(
+            screen.getByRole("button", { name: "Add quick entry" }),
+        );
+        quickDialog = screen.getByRole("dialog");
+        expect(
+            Array.from(quickDialog.querySelectorAll(".type-tabs button")).map(
+                (button) => button.textContent,
+            ),
+        ).toEqual(["Task"]);
+        fireEvent.click(
+            within(quickDialog).getByRole("button", { name: "Close" }),
+        );
 
-    fireEvent.click(screen.getByRole('button',{name:'Habits'}))
-    expect(await screen.findByRole('heading',{name:'Habits'})).toBeInTheDocument()
-    expect(screen.getByText('EVERY SMALL STEP COUNTS')).toBeInTheDocument()
-    expect(screen.getByRole('button',{name:'Add habit'})).toBeInTheDocument()
+        fireEvent.click(screen.getByRole("button", { name: "Habits" }));
+        expect(
+            await screen.findByRole("heading", { name: "Habits" }),
+        ).toBeInTheDocument();
+        expect(screen.getByText("EVERY SMALL STEP COUNTS")).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: "Add habit" }),
+        ).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button',{name:'Statistics'}))
-    expect(await screen.findByRole('heading',{name:'Statistics'})).toBeInTheDocument()
-    expect(screen.getByText('KNOW YOURSELF')).toBeInTheDocument()
-    expect(screen.getByText('Income categories')).toBeInTheDocument()
-    expect(screen.getByText('Entries this month')).toBeInTheDocument()
-    expect(screen.getByText('Habits today')).toBeInTheDocument()
-    expect(screen.getByText('Activities this month')).toBeInTheDocument()
-    expect(screen.getByText('Total activities recorded')).toBeInTheDocument()
+        fireEvent.click(screen.getByRole("button", { name: "Statistics" }));
+        expect(
+            await screen.findByRole("heading", { name: "Statistics" }),
+        ).toBeInTheDocument();
+        expect(screen.getByText("KNOW YOURSELF")).toBeInTheDocument();
+        expect(screen.getByText("Income categories")).toBeInTheDocument();
+        expect(screen.getByText("Entries this month")).toBeInTheDocument();
+        expect(screen.getByText("Habits today")).toBeInTheDocument();
+        expect(screen.getByText("Activities this month")).toBeInTheDocument();
+        expect(
+            screen.getByText("Total activities recorded"),
+        ).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button',{name:'Settings'}))
-    expect(await screen.findByText('Custom categories')).toBeInTheDocument()
-    expect(screen.getAllByText('Expense').length).toBeGreaterThanOrEqual(2)
-    const addExpenseCategory=screen.getByRole('button',{name:'Add expense category'})
-    expect(addExpenseCategory).toHaveClass('category-add-button','secondary')
-    fireEvent.click(addExpenseCategory)
-    let categoryDialog=screen.getByRole('dialog',{name:'Add expense category'})
-    fireEvent.change(within(categoryDialog).getByLabelText('Category name?'),{target:{value:'Books'}})
-    fireEvent.click(within(categoryDialog).getByLabelText('Category color'))
-    fireEvent.click(within(categoryDialog).getByRole('menuitemradio',{name:'#d96767'}))
-    fireEvent.click(within(categoryDialog).getByRole('button',{name:'Add'}))
-    await waitFor(async()=>expect((await db.categories.toArray()).find(category=>category.name==='Books')?.color).toBe('#d96767'))
-    const booksColor=await screen.findByLabelText('Category color: Books')
-    fireEvent.click(booksColor)
-    fireEvent.click(screen.getByRole('menuitemradio',{name:'#467caf'}))
-    await waitFor(async()=>expect((await db.categories.toArray()).find(category=>category.name==='Books')?.color).toBe('#467caf'))
-    expect(screen.getAllByText('Privacy')).toHaveLength(2)
-    expect(screen.getByRole('button',{name:'Download JSON backup'})).toBeInTheDocument()
-    expect(screen.getByRole('button',{name:'Import backup'})).toBeInTheDocument()
-    expect(screen.getByRole('button',{name:'Download finance CSV'})).toBeInTheDocument()
-    expect(screen.getByText('Google Drive backup')).toBeInTheDocument()
-    expect(screen.getByText(/Your personal entries are stored in your browser’s local database/)).toBeInTheDocument()
-  })
-})
+        fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+        expect(
+            await screen.findByText("Custom categories"),
+        ).toBeInTheDocument();
+        expect(screen.getAllByText("Expense").length).toBeGreaterThanOrEqual(2);
+        const addExpenseCategory = screen.getByRole("button", {
+            name: "Add expense category",
+        });
+        expect(addExpenseCategory).toHaveClass(
+            "category-add-button",
+            "secondary",
+        );
+        fireEvent.click(addExpenseCategory);
+        let categoryDialog = screen.getByRole("dialog", {
+            name: "Add expense category",
+        });
+        fireEvent.change(
+            within(categoryDialog).getByLabelText("Category name?"),
+            { target: { value: "Books" } },
+        );
+        fireEvent.click(
+            within(categoryDialog).getByLabelText("Category color"),
+        );
+        fireEvent.click(
+            within(categoryDialog).getByRole("menuitemradio", {
+                name: "#d96767",
+            }),
+        );
+        fireEvent.click(
+            within(categoryDialog).getByRole("button", { name: "Add" }),
+        );
+        await waitFor(async () =>
+            expect(
+                (await db.categories.toArray()).find(
+                    (category) => category.name === "Books",
+                )?.color,
+            ).toBe("#d96767"),
+        );
+        const booksColor = await screen.findByLabelText(
+            "Category color: Books",
+        );
+        fireEvent.click(booksColor);
+        fireEvent.click(screen.getByRole("menuitemradio", { name: "#467caf" }));
+        await waitFor(async () =>
+            expect(
+                (await db.categories.toArray()).find(
+                    (category) => category.name === "Books",
+                )?.color,
+            ).toBe("#467caf"),
+        );
+        expect(screen.getAllByText("Privacy")).toHaveLength(2);
+        expect(
+            screen.getByRole("button", { name: "Download JSON backup" }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: "Import backup" }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: "Download finance CSV" }),
+        ).toBeInTheDocument();
+        expect(screen.getByText("Google Drive backup")).toBeInTheDocument();
+        expect(
+            screen.getByText(
+                /Your personal entries are stored in your browser’s local database/,
+            ),
+        ).toBeInTheDocument();
+    });
+});
