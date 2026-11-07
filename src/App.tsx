@@ -6,11 +6,7 @@ import {
     BarChart3,
     CalendarDays,
     Check,
-    ChevronLeft,
     ChevronRight,
-    Cloud,
-    Download,
-    Edit2,
     FileText,
     Gem,
     Home,
@@ -19,7 +15,6 @@ import {
     Moon,
     MoreHorizontal,
     Plus,
-    Search,
     Settings,
     Sun,
     Trash2,
@@ -47,6 +42,19 @@ import AssetsPage from "./components/assets/AssetsPage";
 import TodayEntriesPage from "./components/entries/TodayEntriesPage";
 import todayEntriesStyles from "./components/entries/TodayEntriesPage.module.css";
 import FinancePage from "./components/finance/FinancePage";
+import HomePage from "./components/home/HomePage";
+import CalendarPage from "./components/calendar/CalendarPage";
+import CalendarDayReport from "./components/calendar/CalendarDayReport";
+import { Empty, RecordList, RecordRow } from "./components/entries/EntryList";
+import {
+    categoryDisplay,
+    entryTimestamp,
+} from "./components/entries/entryUtils";
+import JournalTasksPage from "./components/journal/JournalTasksPage";
+import StatisticsPage from "./components/statistics/StatisticsPage";
+import SettingsPage, {
+    CategoryColorPicker,
+} from "./components/settings/SettingsPage";
 import { t, type Language } from "./i18n";
 
 type Page =
@@ -80,20 +88,6 @@ const defaultCats = [
     { name: "Sağlık", color: "#51a989" },
     { name: "Diğer", color: "#8c99a8" },
 ];
-const categoryColors = [
-    "#d96767",
-    "#ec9a55",
-    "#d6b449",
-    "#65a784",
-    "#438a67",
-    "#399c9a",
-    "#6091d5",
-    "#467caf",
-    "#a080d0",
-    "#dc7180",
-    "#8c99a8",
-    "#795548",
-];
 const initialCategories = async () => {
     if (!(await db.categories.count()))
         await db.categories.bulkAdd([
@@ -119,67 +113,6 @@ const initialCategories = async () => {
 const amountText = (minor: number) => money(minor);
 const balanceText = (minor: number) =>
     amountText(minor).replace(/^([−-])(?=₺)/, "$1 ");
-
-function CategoryColorPicker({
-    value,
-    label,
-    onChange,
-}: {
-    value: string;
-    label: string;
-    onChange: (color: string) => void;
-}) {
-    const [open, setOpen] = useState(false);
-    return (
-        <div className="category-color-picker">
-            <button
-                type="button"
-                className="category-color-trigger"
-                aria-label={label}
-                aria-haspopup="menu"
-                aria-expanded={open}
-                onClick={() => setOpen(!open)}
-            >
-                <i style={{ background: value }} />
-                <span>{value.toUpperCase()}</span>
-            </button>
-            {open && (
-                <div
-                    className="category-color-menu"
-                    role="menu"
-                    aria-label={label}
-                >
-                    {categoryColors.map((color) => (
-                        <button
-                            type="button"
-                            role="menuitemradio"
-                            aria-label={color}
-                            aria-checked={value.toLowerCase() === color}
-                            className={
-                                value.toLowerCase() === color ? "selected" : ""
-                            }
-                            key={color}
-                            onClick={() => {
-                                onChange(color);
-                                setOpen(false);
-                            }}
-                        >
-                            <i style={{ background: color }} />
-                        </button>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-}
-const categoryDisplay = (name: string, language: Language) => t(name, language);
-const entryTimestamp = (item: Entry) =>
-    item.kind === "expense" ||
-    item.kind === "income" ||
-    item.kind === "activity" ||
-    item.kind === "note"
-        ? item.occurredAt
-        : item.createdAt;
 
 function App() {
     const [page, setPage] = useState<Page>("home"),
@@ -719,191 +652,85 @@ function App() {
                     className={`content ${page === "dayEntries" ? todayEntriesStyles.content : ""}`}
                 >
                     {page === "home" && (
-                        <>
-                            <div className="welcome">
-                                <div>
-                                    <div className="eyebrow">
-                                        {format(
-                                            new Date(),
-                                            "EEEE, d MMMM yyyy",
-                                            {
-                                                locale:
-                                                    language === "en"
-                                                        ? undefined
-                                                        : tr,
-                                            },
-                                        )}
-                                    </div>
-                                    <h1>
-                                        {language === "en"
-                                            ? "Hello 👋"
-                                            : "Merhaba 👋"}
-                                    </h1>
-                                    <p>
-                                        {language === "en"
-                                            ? "What have you done for yourself today?"
-                                            : "Bugün kendin için neler yaptın?"}
-                                    </p>
-                                </div>
-                                <button
-                                    className="primary desktop-add"
-                                    onClick={() => open()}
-                                >
-                                    <Plus size={18} />{" "}
-                                    {language === "en"
-                                        ? "Quick add"
-                                        : "Hızlı ekle"}
-                                </button>
-                            </div>
-                            <div className="summary-grid">
-                                <div className="summary-card">
-                                    <div className="summary-icon green-icon">
-                                        <ArrowDownLeft size={19} />
-                                    </div>
-                                    <span>{text("Bugünkü gider")}</span>
-                                    <strong>{amountText(todaySpent)}</strong>
-                                    <small>
-                                        {text("Bugün kaydedilen harcamalar")}
-                                    </small>
-                                </div>
-                                <div className="summary-card">
-                                    <div className="summary-icon blue-icon">
-                                        <ArrowUpRight size={19} />
-                                    </div>
-                                    <span>{text("Bugünkü gelir")}</span>
-                                    <strong>{amountText(todayIncome)}</strong>
-                                    <small>
-                                        {text("Bugün kaydedilen gelirler")}
-                                    </small>
-                                </div>
-                                <div className="summary-card">
-                                    <div className="summary-icon purple-icon">
-                                        <Wallet size={19} />
-                                    </div>
-                                    <span>{text("Bu ay harcanan")}</span>
-                                    <strong>{amountText(monthSpent)}</strong>
-                                    <small>
-                                        {language === "en"
-                                            ? format(new Date(), "MMMM") +
-                                              " total"
-                                            : format(new Date(), "MMMM", {
-                                                  locale: tr,
-                                              }) + " toplamı"}
-                                    </small>
-                                </div>
-                            </div>
-                            <div className="dashboard-grid">
-                                <section className="panel recent-entries-panel">
-                                    <div className="panel-heading">
-                                        <div>
-                                            <h2>{text("Son kayıtlar")}</h2>
-                                            <p>
-                                                {text(
-                                                    "Günlük hayatından notlar",
-                                                )}
-                                            </p>
-                                        </div>
-                                        <button
-                                            className="text-button"
-                                            onClick={() => {
-                                                setQuery("");
-                                                setPage("dayEntries");
-                                            }}
-                                        >
-                                            {text("Tümünü gör")}
-                                            <ChevronRight size={16} />
-                                        </button>
-                                    </div>
-                                    {items.slice(0, 5).length ? (
-                                        items
-                                            .slice(0, 5)
-                                            .map((i) => (
-                                                <RecordRow
-                                                    key={i.id}
-                                                    item={i}
-                                                    categories={categories}
-                                                    language={language}
-                                                    onEdit={() =>
-                                                        open(i.kind, i)
-                                                    }
-                                                    onDelete={() =>
-                                                        void remove(i)
-                                                    }
-                                                    onToggleTask={
-                                                        i.kind === "task"
-                                                            ? () =>
-                                                                  void toggleTask(
-                                                                      i,
-                                                                  )
-                                                            : undefined
-                                                    }
-                                                />
-                                            ))
-                                    ) : (
-                                        <Empty
-                                            icon={<FileText />}
-                                            title="Henüz kayıt yok"
-                                            text="İlk kaydını ekleyerek başlayabilirsin."
-                                        />
-                                    )}
-                                </section>
-                                <section className="panel">
-                                    <div className="panel-heading">
-                                        <div>
-                                            <h2>{text("Yapılacaklar")}</h2>
-                                            <p>
-                                                {todaysTasks.length}{" "}
-                                                tamamlanmamış görev
-                                            </p>
-                                        </div>
-                                        <button
-                                            className="round-mini"
-                                            onClick={() => open("task")}
-                                        >
-                                            <Plus size={17} />
-                                        </button>
-                                    </div>
-                                    {todaysTasks.length ? (
-                                        todaysTasks.slice(0, 4).map((task) => (
-                                            <button
-                                                key={task.id}
-                                                className="task-line"
-                                                onClick={() =>
-                                                    void toggleTask(task)
+                        <HomePage
+                            language={language}
+                            dateLabel={format(new Date(), "EEEE, d MMMM yyyy", {
+                                locale: language === "en" ? undefined : tr,
+                            })}
+                            monthLabel={
+                                language === "en"
+                                    ? `${format(new Date(), "MMMM")} total`
+                                    : `${format(new Date(), "MMMM", { locale: tr })} toplamı`
+                            }
+                            todaySpent={todaySpent}
+                            todayIncome={todayIncome}
+                            monthSpent={monthSpent}
+                            pendingTaskCount={todaysTasks.length}
+                            onQuickAdd={() => open()}
+                            onViewAll={() => {
+                                setQuery("");
+                                setPage("dayEntries");
+                            }}
+                            onAddTask={() => open("task")}
+                            onOpenFinance={() => setPage("finance")}
+                            recentEntries={
+                                items.slice(0, 5).length ? (
+                                    items
+                                        .slice(0, 5)
+                                        .map((item) => (
+                                            <RecordRow
+                                                key={item.id}
+                                                item={item}
+                                                categories={categories}
+                                                language={language}
+                                                onEdit={() =>
+                                                    open(item.kind, item)
                                                 }
-                                            >
-                                                <span className="check-circle" />
-                                                <span>{task.title}</span>
-                                                <ChevronRight size={15} />
-                                            </button>
+                                                onDelete={() =>
+                                                    void remove(item)
+                                                }
+                                                onToggleTask={
+                                                    item.kind === "task"
+                                                        ? () =>
+                                                              void toggleTask(
+                                                                  item,
+                                                              )
+                                                        : undefined
+                                                }
+                                            />
                                         ))
-                                    ) : (
-                                        <Empty
-                                            icon={<Check />}
-                                            title="Her şey yolunda"
-                                            text="Bugün için bekleyen görevin yok."
-                                        />
-                                    )}
-                                    <div className="month-callout">
-                                        <div className="callout-icon">
-                                            <BarChart3 size={18} />
-                                        </div>
-                                        <div>
-                                            <small>
-                                                {text("Aylık harcama")}
-                                            </small>
-                                            <b>{amountText(monthSpent)}</b>
-                                        </div>
+                                ) : (
+                                    <Empty
+                                        icon={<FileText />}
+                                        title="Henüz kayıt yok"
+                                        text="İlk kaydını ekleyerek başlayabilirsin."
+                                    />
+                                )
+                            }
+                            pendingTasks={
+                                todaysTasks.length ? (
+                                    todaysTasks.slice(0, 4).map((task) => (
                                         <button
-                                            onClick={() => setPage("finance")}
-                                            aria-label="Finansa git"
+                                            key={task.id}
+                                            className="task-line"
+                                            onClick={() =>
+                                                void toggleTask(task)
+                                            }
                                         >
-                                            <ChevronRight size={18} />
+                                            <span className="check-circle" />
+                                            <span>{task.title}</span>
+                                            <ChevronRight size={15} />
                                         </button>
-                                    </div>
-                                </section>
-                            </div>
-                        </>
+                                    ))
+                                ) : (
+                                    <Empty
+                                        icon={<Check />}
+                                        title="Her şey yolunda"
+                                        text="Bugün için bekleyen görevin yok."
+                                    />
+                                )
+                            }
+                        />
                     )}
                     {page === "dayEntries" && (
                         <TodayEntriesPage
@@ -941,94 +768,25 @@ function App() {
                         </TodayEntriesPage>
                     )}
                     {page === "calendar" && (
-                        <>
-                            <section className="panel calendar-panel">
-                                <div className="panel-heading">
-                                    <div>
-                                        <div className="eyebrow">
-                                            {text("GEÇMİŞİNE GÖZ AT")}
-                                        </div>
-                                        <h2 className="calendar-title">
-                                            {pageLabel("calendar")}
-                                        </h2>
-                                    </div>
-                                    <div className="month-nav">
-                                        <button
-                                            onClick={() =>
-                                                setMonth(subMonths(month, 1))
-                                            }
-                                            aria-label={text("Önceki ay")}
-                                        >
-                                            <ChevronLeft />
-                                        </button>
-                                        <b>{fmtMonth(month)}</b>
-                                        <button
-                                            onClick={() =>
-                                                setMonth(addMonths(month, 1))
-                                            }
-                                            aria-label={text("Sonraki ay")}
-                                        >
-                                            <ChevronRight />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="calendar-grid">
-                                    {(language === "en"
-                                        ? [
-                                              "Mon",
-                                              "Tue",
-                                              "Wed",
-                                              "Thu",
-                                              "Fri",
-                                              "Sat",
-                                              "Sun",
-                                          ]
-                                        : [
-                                              "Pzt",
-                                              "Sal",
-                                              "Çar",
-                                              "Per",
-                                              "Cum",
-                                              "Cmt",
-                                              "Paz",
-                                          ]
-                                    ).map((d) => (
-                                        <span className="weekday" key={d}>
-                                            {d}
-                                        </span>
-                                    ))}
-                                    {Array.from({ length: offset }, (_, i) => (
-                                        <span key={`blank${i}`} />
-                                    ))}
-                                    {Array.from(
-                                        { length: daysInMonth },
-                                        (_, i) => {
-                                            const day = String(i + 1).padStart(
-                                                    2,
-                                                    "0",
-                                                ),
-                                                date = `${format(month, "yyyy-MM")}-${day}`,
-                                                dayItems = items.filter(
-                                                    (x) => x.localDate === date,
-                                                );
-                                            return (
-                                                <button
-                                                    onClick={() =>
-                                                        setQuery(date)
-                                                    }
-                                                    className={`calendar-day ${date === today ? "today" : ""} ${query === date ? "selected" : ""}`}
-                                                    key={date}
-                                                >
-                                                    {i + 1}
-                                                    {dayItems.length > 0 && (
-                                                        <i />
-                                                    )}
-                                                </button>
-                                            );
-                                        },
-                                    )}
-                                </div>
-                            </section>
+                        <CalendarPage
+                            language={language}
+                            title={pageLabel("calendar")}
+                            eyebrow={text("GEÇMİŞİNE GÖZ AT")}
+                            monthLabel={fmtMonth(month)}
+                            month={month}
+                            daysInMonth={daysInMonth}
+                            offset={offset}
+                            today={today}
+                            selectedDate={query}
+                            datesWithEntries={items.map(
+                                (item) => item.localDate,
+                            )}
+                            onPreviousMonth={() =>
+                                setMonth(subMonths(month, 1))
+                            }
+                            onNextMonth={() => setMonth(addMonths(month, 1))}
+                            onSelectDate={setQuery}
+                        >
                             <CalendarDayReport
                                 date={calendarDate}
                                 items={items}
@@ -1040,7 +798,7 @@ function App() {
                                 onDelete={(item) => void remove(item)}
                                 onToggleTask={(task) => void toggleTask(task)}
                             />
-                        </>
+                        </CalendarPage>
                     )}
                     {page === "finance" && (
                         <FinancePage
@@ -1074,56 +832,28 @@ function App() {
                         />
                     )}
                     {(page === "journal" || page === "tasks") && (
-                        <>
-                            <div className="page-heading">
-                                <div>
-                                    <div className="eyebrow">
-                                        {text(
-                                            page === "journal"
-                                                ? "GÜNLÜK YAŞAMIN"
-                                                : "AKLINDAKİLERİ PLANLA",
-                                        )}
-                                    </div>
-                                    <h1>{pageLabel(page)}</h1>
-                                    <p>
-                                        {text(
-                                            page === "journal"
-                                                ? "Anılarını, notlarını ve yaptıklarını sakla."
-                                                : "Görevlerini tek yerde takip et.",
-                                        )}
-                                    </p>
-                                </div>
-                                <button
-                                    className="primary"
-                                    onClick={() =>
-                                        open(
-                                            page === "journal"
-                                                ? "activity"
-                                                : "task",
-                                        )
-                                    }
-                                >
-                                    <Plus size={18} /> {text("Ekle")}
-                                </button>
-                            </div>
-                            <section
-                                className={`panel ${page === "tasks" ? "tasks-panel" : ""}`}
-                            >
-                                <RecordList
-                                    language={language}
-                                    items={filtered}
-                                    categories={categories}
-                                    onEdit={(i) => open(i.kind, i)}
-                                    onDelete={remove}
-                                    onToggleTask={(i) => {
-                                        if (i.kind === "task")
-                                            void toggleTask(i);
-                                    }}
-                                    query={query}
-                                    setQuery={setQuery}
-                                />
-                            </section>
-                        </>
+                        <JournalTasksPage
+                            isTasks={page === "tasks"}
+                            language={language}
+                            title={pageLabel(page)}
+                            onAdd={() =>
+                                open(page === "journal" ? "activity" : "task")
+                            }
+                        >
+                            <RecordList
+                                language={language}
+                                items={filtered}
+                                categories={categories}
+                                onEdit={(item) => open(item.kind, item)}
+                                onDelete={remove}
+                                onToggleTask={(item) => {
+                                    if (item.kind === "task")
+                                        void toggleTask(item);
+                                }}
+                                query={query}
+                                setQuery={setQuery}
+                            />
+                        </JournalTasksPage>
                     )}
                     {page === "habits" && (
                         <HabitsPage
@@ -1136,447 +866,161 @@ function App() {
                         <AssetsPage language={language} onNotice={setNotice} />
                     )}
                     {page === "stats" && (
-                        <>
-                            <div className="page-heading">
-                                <div>
-                                    <div className="eyebrow">
-                                        {text("KENDİNİ KEŞFET")}
-                                    </div>
-                                    <h1>{text("İstatistikler")}</h1>
-                                    <p>
-                                        {text(
-                                            "Gelirini, giderini ve alışkanlıklarını birlikte gör.",
+                        <StatisticsPage
+                            language={language}
+                            title={pageLabel("stats")}
+                            income={amountText(monthIncome)}
+                            expenses={amountText(monthSpent)}
+                            balance={balanceText(monthIncome - monthSpent)}
+                            incomeCategories={categories
+                                .filter(
+                                    (category) => category.kind === "income",
+                                )
+                                .map((category) => ({
+                                    id: category.id,
+                                    name: categoryDisplay(
+                                        category.name,
+                                        language,
+                                    ),
+                                    color: category.color,
+                                    amount: money(
+                                        monthTx
+                                            .filter(
+                                                (item) =>
+                                                    item.kind === "income" &&
+                                                    item.categoryId ===
+                                                        category.id,
+                                            )
+                                            .reduce(
+                                                (sum, item) =>
+                                                    sum + item.amountMinor,
+                                                0,
+                                            ),
+                                    ),
+                                    total: monthTx
+                                        .filter(
+                                            (item) =>
+                                                item.kind === "income" &&
+                                                item.categoryId === category.id,
+                                        )
+                                        .reduce(
+                                            (sum, item) =>
+                                                sum + item.amountMinor,
+                                            0,
+                                        ),
+                                }))
+                                .filter((category) => category.total > 0)}
+                            expenseCategories={categories
+                                .filter(
+                                    (category) => category.kind === "expense",
+                                )
+                                .map((category) => ({
+                                    id: category.id,
+                                    name: categoryDisplay(
+                                        category.name,
+                                        language,
+                                    ),
+                                    color: category.color,
+                                    amount: money(
+                                        monthTx
+                                            .filter(
+                                                (item) =>
+                                                    item.kind === "expense" &&
+                                                    item.categoryId ===
+                                                        category.id,
+                                            )
+                                            .reduce(
+                                                (sum, item) =>
+                                                    sum + item.amountMinor,
+                                                0,
+                                            ),
+                                    ),
+                                    total: monthTx
+                                        .filter(
+                                            (item) =>
+                                                item.kind === "expense" &&
+                                                item.categoryId === category.id,
+                                        )
+                                        .reduce(
+                                            (sum, item) =>
+                                                sum + item.amountMinor,
+                                            0,
+                                        ),
+                                }))
+                                .filter((category) => category.total > 0)}
+                            monthEntries={
+                                items.filter((item) =>
+                                    item.localDate.startsWith(monthPrefix),
+                                ).length
+                            }
+                            habitCompletion={
+                                habits.length
+                                    ? `${Math.round((completions.length / habits.length) * 100)}%`
+                                    : "—"
+                            }
+                            habitCountLabel={
+                                language === "en"
+                                    ? `${completions.length} / ${habits.length} completed`
+                                    : `${completions.length} / ${habits.length} tamamlandı`
+                            }
+                            monthActivities={
+                                items.filter(
+                                    (item) =>
+                                        item.kind === "activity" &&
+                                        item.localDate.startsWith(monthPrefix),
+                                ).length
+                            }
+                            emptyIncome={
+                                !monthIncome ? (
+                                    <Empty
+                                        icon={<ArrowUpRight />}
+                                        title={text("Henüz gelir kaydı yok")}
+                                        text={text(
+                                            "Gelirlerin burada kategoriye göre özetlenir.",
                                         )}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="summary-grid">
-                                <div className="summary-card">
-                                    <span>{text("Bu ay gelir")}</span>
-                                    <strong>{amountText(monthIncome)}</strong>
-                                </div>
-                                <div className="summary-card">
-                                    <span>{text("Bu ay gider")}</span>
-                                    <strong>{amountText(monthSpent)}</strong>
-                                </div>
-                                <div className="summary-card">
-                                    <span>{text("Net bakiye")}</span>
-                                    <strong>
-                                        {balanceText(monthIncome - monthSpent)}
-                                    </strong>
-                                    <small>{text("Gelir eksi gider")}</small>
-                                </div>
-                            </div>
-                            <div className="dashboard-grid">
-                                <section className="panel">
-                                    <div className="panel-heading">
-                                        <div>
-                                            <h2>
-                                                {text("Gelir kategorileri")}
-                                            </h2>
-                                            <p>
-                                                {language === "en"
-                                                    ? "This month"
-                                                    : "Bu ay"}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    {categories
-                                        .filter((c) => c.kind === "income")
-                                        .map((c) => {
-                                            const v = monthTx
-                                                .filter(
-                                                    (i) =>
-                                                        i.kind === "income" &&
-                                                        i.categoryId === c.id,
-                                                )
-                                                .reduce(
-                                                    (s, x) => s + x.amountMinor,
-                                                    0,
-                                                );
-                                            return (
-                                                v > 0 && (
-                                                    <div
-                                                        className="category-line"
-                                                        key={c.id}
-                                                    >
-                                                        <i
-                                                            style={{
-                                                                background:
-                                                                    c.color,
-                                                            }}
-                                                        />
-                                                        <span>
-                                                            {categoryDisplay(
-                                                                c.name,
-                                                                language,
-                                                            )}
-                                                        </span>
-                                                        <b>{money(v)}</b>
-                                                    </div>
-                                                )
-                                            );
-                                        })}
-                                    {!monthIncome && (
-                                        <Empty
-                                            icon={<ArrowUpRight />}
-                                            title={text(
-                                                "Henüz gelir kaydı yok",
-                                            )}
-                                            text={text(
-                                                "Gelirlerin burada kategoriye göre özetlenir.",
-                                            )}
-                                        />
-                                    )}
-                                </section>
-                                <section className="panel">
-                                    <div className="panel-heading">
-                                        <div>
-                                            <h2>
-                                                {text("Gider kategorileri")}
-                                            </h2>
-                                            <p>
-                                                {language === "en"
-                                                    ? "This month"
-                                                    : "Bu ay"}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    {categories
-                                        .filter((c) => c.kind === "expense")
-                                        .map((c) => {
-                                            const v = monthTx
-                                                .filter(
-                                                    (i) =>
-                                                        i.kind === "expense" &&
-                                                        i.categoryId === c.id,
-                                                )
-                                                .reduce(
-                                                    (s, x) => s + x.amountMinor,
-                                                    0,
-                                                );
-                                            return (
-                                                v > 0 && (
-                                                    <div
-                                                        className="category-line"
-                                                        key={c.id}
-                                                    >
-                                                        <i
-                                                            style={{
-                                                                background:
-                                                                    c.color,
-                                                            }}
-                                                        />
-                                                        <span>
-                                                            {categoryDisplay(
-                                                                c.name,
-                                                                language,
-                                                            )}
-                                                        </span>
-                                                        <b>{money(v)}</b>
-                                                    </div>
-                                                )
-                                            );
-                                        })}
-                                    {!monthSpent && (
-                                        <Empty
-                                            icon={<ArrowDownLeft />}
-                                            title={text(
-                                                "Henüz gider kaydı yok",
-                                            )}
-                                            text={text(
-                                                "Harcamaların burada kategoriye göre özetlenir.",
-                                            )}
-                                        />
-                                    )}
-                                </section>
-                            </div>
-                            <div className="summary-grid stats-secondary">
-                                <div className="summary-card">
-                                    <span>{text("Bu ay kayıt")}</span>
-                                    <strong>
-                                        {
-                                            items.filter((i) =>
-                                                i.localDate.startsWith(
-                                                    monthPrefix,
-                                                ),
-                                            ).length
-                                        }
-                                    </strong>
-                                    <small>
-                                        {text("Günlük kayıtların toplamı")}
-                                    </small>
-                                </div>
-                                <div className="summary-card">
-                                    <span>{text("Bugün alışkanlıklar")}</span>
-                                    <strong>
-                                        {habits.length
-                                            ? `${Math.round((completions.length / habits.length) * 100)}%`
-                                            : "—"}
-                                    </strong>
-                                    <small>
-                                        {language === "en"
-                                            ? `${completions.length} / ${habits.length} completed`
-                                            : `${completions.length} / ${habits.length} tamamlandı`}
-                                    </small>
-                                </div>
-                                <div className="summary-card">
-                                    <span>{text("Bu ay aktiviteler")}</span>
-                                    <strong>
-                                        {
-                                            items.filter(
-                                                (i) =>
-                                                    i.kind === "activity" &&
-                                                    i.localDate.startsWith(
-                                                        monthPrefix,
-                                                    ),
-                                            ).length
-                                        }
-                                    </strong>
-                                    <small>
-                                        {text("Günlük aktivitelerin")}
-                                    </small>
-                                </div>
-                            </div>
-                        </>
+                                    />
+                                ) : null
+                            }
+                            emptyExpenses={
+                                !monthSpent ? (
+                                    <Empty
+                                        icon={<ArrowDownLeft />}
+                                        title={text("Henüz gider kaydı yok")}
+                                        text={text(
+                                            "Harcamaların burada kategoriye göre özetlenir.",
+                                        )}
+                                    />
+                                ) : null
+                            }
+                        />
                     )}
                     {page === "settings" && (
-                        <>
-                            <div className="page-heading">
-                                <div>
-                                    <div className="eyebrow">
-                                        {text("SENİN UYGULAMAN")}
-                                    </div>
-                                    <h1>{pageLabel("settings")}</h1>
-                                    <p>
-                                        {text(
-                                            "Görünümünü düzenle, verilerini koru.",
-                                        )}
-                                    </p>
-                                </div>
-                            </div>
-                            <section className="panel setting-panel">
-                                <h2>{text("Görünüm")}</h2>
-                                <div className="setting-row">
-                                    <div>
-                                        <b>
-                                            {language === "en"
-                                                ? "Language"
-                                                : "Dil"}
-                                        </b>
-                                        <small>
-                                            {language === "en"
-                                                ? "Choose the interface language."
-                                                : "Arayüz dilini seç."}
-                                        </small>
-                                    </div>
-                                    <div className="choice-group">
-                                        <button
-                                            className={
-                                                language === "en"
-                                                    ? "chosen"
-                                                    : ""
-                                            }
-                                            onClick={() => setLanguage("en")}
-                                        >
-                                            English
-                                        </button>
-                                        <button
-                                            className={
-                                                language === "tr"
-                                                    ? "chosen"
-                                                    : ""
-                                            }
-                                            onClick={() => setLanguage("tr")}
-                                        >
-                                            {text("Türkçe")}
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="setting-row">
-                                    <div>
-                                        <b>{text("Renk teması")}</b>
-                                        <small>
-                                            {text(
-                                                "Uygulamanın vurgu rengini seç.",
-                                            )}
-                                        </small>
-                                    </div>
-                                    <div className="choice-group">
-                                        <button
-                                            className={
-                                                accent === "green"
-                                                    ? "chosen"
-                                                    : ""
-                                            }
-                                            onClick={() =>
-                                                changeAccent("green")
-                                            }
-                                        >
-                                            <i className="dot green-dot" />
-                                            {text("Yeşil")}
-                                        </button>
-                                        <button
-                                            className={
-                                                accent === "blue"
-                                                    ? "chosen"
-                                                    : ""
-                                            }
-                                            onClick={() => changeAccent("blue")}
-                                        >
-                                            <i className="dot blue-dot" />
-                                            {language === "en"
-                                                ? "Blue"
-                                                : "Mavi"}
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="setting-row">
-                                    <div>
-                                        <b>{text("Görünüm modu")}</b>
-                                        <small>
-                                            {text("Açık veya koyu tema.")}
-                                        </small>
-                                    </div>
-                                    <div className="choice-group">
-                                        <button
-                                            className={
-                                                theme === "light"
-                                                    ? "chosen"
-                                                    : ""
-                                            }
-                                            onClick={() => setTheme("light")}
-                                        >
-                                            <Sun size={15} />
-                                            {text("Açık")}
-                                        </button>
-                                        <button
-                                            className={
-                                                theme === "dark" ? "chosen" : ""
-                                            }
-                                            onClick={() => setTheme("dark")}
-                                        >
-                                            <Moon size={15} />
-                                            {language === "en"
-                                                ? "Dark"
-                                                : "Koyu"}
-                                        </button>
-                                    </div>
-                                </div>
-                            </section>
-                            <section className="panel setting-panel">
-                                <h2>
-                                    {language === "en" ? "Privacy" : "Gizlilik"}
-                                </h2>
-                                <p className="subtle">
-                                    {text(
-                                        "Verilerin bu cihazda saklanır. Hesap gerekmez; dışarı aktararak yedekleyebilirsin.",
-                                    )}
-                                </p>
-                                <div className="backup-actions">
-                                    <button
-                                        className="secondary"
-                                        onClick={() => void exportJson()}
-                                    >
-                                        <Download size={17} />
-                                        {text("JSON yedeği indir")}
-                                    </button>
-                                    <button
-                                        className="secondary"
-                                        onClick={() =>
-                                            document
-                                                .getElementById("backup-file")
-                                                ?.click()
-                                        }
-                                    >
-                                        <FileText size={17} />
-                                        {text("Yedeği içe aktar")}
-                                    </button>
-                                    <input
-                                        id="backup-file"
-                                        type="file"
-                                        accept="application/json,.json"
-                                        hidden
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0];
-                                            if (file) void importJson(file);
-                                            e.currentTarget.value = "";
-                                        }}
-                                    />
-                                    <button
-                                        className="secondary"
-                                        onClick={exportCsv}
-                                    >
-                                        <Download size={17} />
-                                        {text("Finans CSV indir")}
-                                    </button>
-                                </div>
-                                <div className="drive-note">
-                                    <Cloud size={18} />
-                                    <span>
-                                        <b>{text("Google Drive yedekleme")}</b>
-                                        <small>
-                                            {text(
-                                                "Bu sürümde Drive bağlantısı yapılandırılmadı. Manuel yedekler cihazında çalışır; OAuth ayarı olmadan bağlantı sunulmaz.",
-                                            )}
-                                        </small>
-                                    </span>
-                                </div>
-                            </section>
-                            <section className="panel setting-panel">
-                                <h2>{text("Özel kategoriler")}</h2>
-                                {categories.map((c) => (
-                                    <div
-                                        className="category-line custom-category-line"
-                                        key={c.id}
-                                    >
-                                        <i style={{ background: c.color }} />
-                                        <span>
-                                            {categoryDisplay(c.name, language)}
-                                        </span>
-                                        <small>
-                                            {text(
-                                                c.kind === "expense"
-                                                    ? "Gider"
-                                                    : "Gelir",
-                                            )}
-                                        </small>
-                                        <CategoryColorPicker
-                                            value={c.color}
-                                            label={`${text("Kategori rengi")}: ${categoryDisplay(c.name, language)}`}
-                                            onChange={(color) =>
-                                                void db.categories
-                                                    .update(c.id, {
-                                                        color,
-                                                        updatedAt:
-                                                            new Date().toISOString(),
-                                                    })
-                                                    .then(refresh)
-                                            }
-                                        />
-                                    </div>
-                                ))}
-                                <button
-                                    className="secondary category-add-button"
-                                    onClick={() => {
-                                        setCategoryName("");
-                                        setCategoryColor("#65a784");
-                                        setCategoryDialog(true);
-                                    }}
-                                >
-                                    <Plus size={16} />
-                                    {text("Gider kategorisi ekle")}
-                                </button>
-                            </section>
-                            <section className="panel setting-panel">
-                                <h2>{text("Gizlilik")}</h2>
-                                <p className="subtle">
-                                    {text(
-                                        "Kişisel kayıtların tarayıcının yerel veritabanında saklanır. Tarayıcı verilerini temizlemek kayıtlarını silebilir. Düzenli yedek almanı öneririz. İnternet bağlantısı olmadan kayıtlarına erişebilirsin.",
-                                    )}
-                                </p>
-                            </section>
-                        </>
+                        <SettingsPage
+                            language={language}
+                            theme={theme}
+                            accent={accent}
+                            title={pageLabel("settings")}
+                            categories={categories}
+                            onLanguageChange={setLanguage}
+                            onThemeChange={setTheme}
+                            onAccentChange={changeAccent}
+                            onExportJson={exportJson}
+                            onImportFile={(file) => void importJson(file)}
+                            onExportCsv={exportCsv}
+                            onCategoryColorChange={(categoryId, color) =>
+                                void db.categories
+                                    .update(categoryId, {
+                                        color,
+                                        updatedAt: new Date().toISOString(),
+                                    })
+                                    .then(refresh)
+                            }
+                            onAddCategory={() => {
+                                setCategoryName("");
+                                setCategoryColor("#65a784");
+                                setCategoryDialog(true);
+                            }}
+                        />
                     )}
                 </div>
                 <nav className="bottom-nav">
@@ -2121,511 +1565,6 @@ function App() {
                     </section>
                 </div>
             )}
-        </div>
-    );
-}
-
-function CalendarDayReport({
-    date,
-    items,
-    categories,
-    habits,
-    completedHabitIds,
-    language,
-    onEdit,
-    onDelete,
-    onToggleTask,
-}: {
-    date: string;
-    items: Entry[];
-    categories: Category[];
-    habits: Habit[];
-    completedHabitIds: string[];
-    language: Language;
-    onEdit: (item: Entry) => void;
-    onDelete: (item: Entry) => void;
-    onToggleTask: (task: Task) => void;
-}) {
-    const label = (trText: string, enText: string) =>
-        language === "en" ? enText : trText;
-    const dayItems = items.filter((item) => item.localDate === date);
-    const transactions = dayItems.filter(
-        (item): item is Transaction =>
-            item.kind === "expense" || item.kind === "income",
-    );
-    const expenses = transactions
-        .filter((item) => item.kind === "expense")
-        .reduce((sum, item) => sum + item.amountMinor, 0);
-    const income = transactions
-        .filter((item) => item.kind === "income")
-        .reduce((sum, item) => sum + item.amountMinor, 0);
-    const tasks = dayItems.filter((item): item is Task => item.kind === "task");
-    const journal = dayItems.filter(
-        (item): item is JournalEntry =>
-            item.kind === "activity" || item.kind === "note",
-    );
-    const done = habits.filter((habit) => completedHabitIds.includes(habit.id));
-    const dateLabel = format(
-        new Date(`${date}T12:00:00`),
-        "EEEE, d MMMM yyyy",
-        { locale: language === "en" ? undefined : tr },
-    );
-    return (
-        <section
-            className="calendar-report"
-            aria-label={label("Günlük rapor", "Daily report")}
-        >
-            <header className="calendar-report-heading">
-                <div>
-                    <div className="eyebrow">
-                        {label("GÜNLÜK RAPOR", "DAILY REPORT")}
-                    </div>
-                    <h3>{dateLabel}</h3>
-                    <p>
-                        {dayItems.length} {label("kayıt", "entries")} ·{" "}
-                        {done.length}/{habits.length}{" "}
-                        {label("alışkanlık tamamlandı", "habits completed")}
-                    </p>
-                </div>
-            </header>
-            <div className="calendar-report-sections">
-                <section>
-                    <h4>{label("Genel Bakış", "Overview")}</h4>
-                    <div className="calendar-report-stats">
-                        <div>
-                            <small>{label("Kayıtlar", "Entries")}</small>
-                            <b>{dayItems.length}</b>
-                        </div>
-                        <div>
-                            <small>{label("Alışkanlıklar", "Habits")}</small>
-                            <b>
-                                {done.length}/{habits.length}
-                            </b>
-                        </div>
-                        <div>
-                            <small>
-                                {label(
-                                    "Görevler tamamlandı",
-                                    "Tasks completed",
-                                )}
-                            </small>
-                            <b>
-                                {tasks.filter((task) => task.completed).length}/
-                                {tasks.length}
-                            </b>
-                        </div>
-                    </div>
-                </section>
-                <section>
-                    <h4>
-                        {label("Finans", "Finance")}{" "}
-                        <span>{transactions.length}</span>
-                    </h4>
-                    {transactions.length ? (
-                        transactions.map((item) => (
-                            <RecordRow
-                                key={item.id}
-                                item={item}
-                                categories={categories}
-                                language={language}
-                                onEdit={() => onEdit(item)}
-                                onDelete={() => onDelete(item)}
-                            />
-                        ))
-                    ) : (
-                        <p className="calendar-report-empty">
-                            {label(
-                                "Bu gün için finans kaydı yok.",
-                                "No finance entries for this day.",
-                            )}
-                        </p>
-                    )}
-                    <div className="calendar-report-finance-totals">
-                        <span>
-                            {label("Gelir", "Income")}{" "}
-                            <b className="income-text">{money(income)}</b>
-                        </span>
-                        <span>
-                            {label("Gider", "Expenses")}{" "}
-                            <b className="expense-text">{money(expenses)}</b>
-                        </span>
-                        <span>
-                            {label("Net bakiye", "Net balance")}{" "}
-                            <b>{money(income - expenses)}</b>
-                        </span>
-                    </div>
-                </section>
-                <section>
-                    <h4>
-                        {label("Günlük", "Journal")}{" "}
-                        <span>{journal.length}</span>
-                    </h4>
-                    {journal.length ? (
-                        journal.map((entry) => (
-                            <div className="calendar-report-row" key={entry.id}>
-                                <FileText size={14} />
-                                <span>{entry.title}</span>
-                                <b>
-                                    {entry.kind === "activity"
-                                        ? label("Aktivite", "Activity")
-                                        : label("Not", "Note")}
-                                </b>
-                            </div>
-                        ))
-                    ) : (
-                        <p className="calendar-report-empty">
-                            {label(
-                                "Bu gün için günlük kaydı yok.",
-                                "No journal entries for this day.",
-                            )}
-                        </p>
-                    )}
-                </section>
-                <section>
-                    <h4>
-                        {label("Görevler", "Tasks")} <span>{tasks.length}</span>
-                    </h4>
-                    {tasks.length ? (
-                        tasks.map((task) => (
-                            <RecordRow
-                                key={task.id}
-                                item={task}
-                                categories={categories}
-                                language={language}
-                                onEdit={() => onEdit(task)}
-                                onDelete={() => onDelete(task)}
-                                onToggleTask={() => onToggleTask(task)}
-                            />
-                        ))
-                    ) : (
-                        <p className="calendar-report-empty">
-                            {label(
-                                "Bu gün için görev yok.",
-                                "No tasks for this day.",
-                            )}
-                        </p>
-                    )}
-                </section>
-                <section>
-                    <h4>
-                        {label("Alışkanlıklar", "Habits")}{" "}
-                        <span>
-                            {done.length}/{habits.length}
-                        </span>
-                    </h4>
-                    {habits.length ? (
-                        habits.map((habit) => (
-                            <div className="calendar-report-row" key={habit.id}>
-                                <i
-                                    style={{
-                                        background:
-                                            habit.color || "var(--accent)",
-                                    }}
-                                />
-                                <span>{habit.title}</span>
-                                <b
-                                    className={
-                                        completedHabitIds.includes(habit.id)
-                                            ? "income-text"
-                                            : ""
-                                    }
-                                >
-                                    {completedHabitIds.includes(habit.id)
-                                        ? label("Tamamlandı", "Completed")
-                                        : label(
-                                              "Tamamlanmadı",
-                                              "Not completed",
-                                          )}
-                                </b>
-                            </div>
-                        ))
-                    ) : (
-                        <p className="calendar-report-empty">
-                            {label(
-                                "Aktif alışkanlık yok.",
-                                "No active habits.",
-                            )}
-                        </p>
-                    )}
-                </section>
-                <section>
-                    <h4>{label("İstatistikler", "Statistics")}</h4>
-                    <div className="calendar-report-stats">
-                        <div>
-                            <small>{label("Gelir", "Income")}</small>
-                            <b className="income-text">{money(income)}</b>
-                        </div>
-                        <div>
-                            <small>{label("Gider", "Expenses")}</small>
-                            <b className="expense-text">{money(expenses)}</b>
-                        </div>
-                        <div>
-                            <small>{label("Net bakiye", "Net balance")}</small>
-                            <b>{money(income - expenses)}</b>
-                        </div>
-                        <div>
-                            <small>
-                                {label("Günlük kayıtlar", "Journal entries")}
-                            </small>
-                            <b>{journal.length}</b>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </section>
-    );
-}
-
-function Empty({
-    icon,
-    title,
-    text,
-}: {
-    icon: React.ReactNode;
-    title: string;
-    text: string;
-}) {
-    return (
-        <div className="empty-state">
-            <div>{icon}</div>
-            <b>{title}</b>
-            <p>{text}</p>
-        </div>
-    );
-}
-function RecordList({
-    items,
-    categories,
-    onEdit,
-    onDelete,
-    onToggleTask,
-    query,
-    setQuery,
-    finance = false,
-    language = "tr",
-    showTimestamp = false,
-}: {
-    items: Entry[];
-    categories: Category[];
-    onEdit: (i: Entry) => void;
-    onDelete: (i: Entry) => void;
-    onToggleTask?: (i: Entry) => void;
-    query: string;
-    setQuery: (v: string) => void;
-    finance?: boolean;
-    language?: Language;
-    showTimestamp?: boolean;
-}) {
-    const list = finance
-        ? items.filter((i) => i.kind === "expense" || i.kind === "income")
-        : items;
-    const word = (trText: string, enText: string) =>
-        language === "en" ? enText : trText;
-    return (
-        <div className="record-list-layout">
-            <div className="list-tools">
-                <div className="search-box">
-                    <Search size={17} />
-                    <input
-                        placeholder={word(
-                            "Kayıtlarda ara...",
-                            "Search entries...",
-                        )}
-                        value={query.match(/^\d{4}-\d{2}-\d{2}$/) ? "" : query}
-                        onChange={(e) => setQuery(e.target.value)}
-                    />
-                </div>
-                {finance && (
-                    <select
-                        className="filter-select"
-                        onChange={(e) =>
-                            setQuery(
-                                e.target.value === "all" ? "" : e.target.value,
-                            )
-                        }
-                    >
-                        <option value="all">
-                            {word("Tüm işlemler", "All transactions")}
-                        </option>
-                        <option value="expense">
-                            {word("Giderler", "Expenses")}
-                        </option>
-                        <option value="income">
-                            {word("Gelirler", "Income")}
-                        </option>
-                    </select>
-                )}
-            </div>
-            <div className="record-list">
-                {list.length ? (
-                    list.map((i) => (
-                        <RecordRow
-                            key={i.id}
-                            item={i}
-                            categories={categories}
-                            language={language}
-                            showTimestamp={showTimestamp}
-                            onEdit={() => onEdit(i)}
-                            onDelete={() => onDelete(i)}
-                            onToggleTask={
-                                onToggleTask ? () => onToggleTask(i) : undefined
-                            }
-                        />
-                    ))
-                ) : (
-                    <Empty
-                        icon={<Search />}
-                        title={word("Kayıt bulunamadı", "No entries found")}
-                        text={word(
-                            "Aramana uygun kayıt yok. Yeni kayıt ekleyebilirsin.",
-                            "No entries match your search. You can add one.",
-                        )}
-                    />
-                )}
-            </div>
-        </div>
-    );
-}
-function RecordRow({
-    item,
-    categories,
-    onEdit,
-    onDelete,
-    onToggleTask,
-    language = "tr",
-    showTimestamp = false,
-}: {
-    item: Entry;
-    categories: Category[];
-    onEdit: () => void;
-    onDelete: () => void;
-    onToggleTask?: () => void;
-    language?: Language;
-    showTimestamp?: boolean;
-}) {
-    const isTx = item.kind === "expense" || item.kind === "income",
-        isTask = item.kind === "task",
-        task = isTask ? (item as Task) : null;
-    const word = (trText: string, enText: string) =>
-        language === "en" ? enText : trText;
-    return (
-        <div
-            className={`record-row ${task ? `task-priority-${task.priority}` : ""} ${task?.completed ? "task-completed" : ""}`}
-        >
-            {task && onToggleTask ? (
-                <button
-                    className={`task-toggle ${task.completed ? "checked" : ""}`}
-                    aria-label={
-                        task.completed
-                            ? word(
-                                  "Tamamlandı işaretini kaldır",
-                                  "Undo completion",
-                              )
-                            : word("Görevi tamamla", "Complete task")
-                    }
-                    aria-pressed={task.completed}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onToggleTask();
-                    }}
-                >
-                    {task.completed && <Check size={14} />}
-                </button>
-            ) : (
-                <div className={`record-icon ${item.kind}`}>
-                    {item.kind === "expense" ? (
-                        <ArrowDownLeft size={17} />
-                    ) : item.kind === "income" ? (
-                        <ArrowUpRight size={17} />
-                    ) : item.kind === "activity" ? (
-                        <Activity size={17} />
-                    ) : item.kind === "note" ? (
-                        <FileText size={17} />
-                    ) : (
-                        <Check size={17} />
-                    )}
-                </div>
-            )}
-            <button
-                className="record-info"
-                onClick={isTask && onToggleTask ? () => onToggleTask() : onEdit}
-            >
-                <b>
-                    {isTx
-                        ? item.description ||
-                          categoryDisplay(
-                              categories.find((c) => c.id === item.categoryId)
-                                  ?.name || word("İşlem", "Transaction"),
-                              language,
-                          )
-                        : (item as JournalEntry | Task).title}
-                </b>
-                <small>
-                    {showTimestamp
-                        ? format(
-                              new Date(entryTimestamp(item)),
-                              "d MMM yyyy, HH:mm",
-                              { locale: language === "en" ? undefined : tr },
-                          )
-                        : format(
-                              new Date(`${item.localDate}T12:00:00`),
-                              "d MMM",
-                              { locale: language === "en" ? undefined : tr },
-                          )}{" "}
-                    ·{" "}
-                    {isTx
-                        ? categoryDisplay(
-                              categories.find((c) => c.id === item.categoryId)
-                                  ?.name || word("Kategori yok", "No category"),
-                              language,
-                          )
-                        : item.kind === "activity"
-                          ? word("Aktivite", "Activity")
-                          : item.kind === "note"
-                            ? word("Not", "Note")
-                            : task?.priority === "high"
-                              ? word("Yüksek öncelik", "High priority")
-                              : word("Görev", "Task")}
-                    {task?.completed
-                        ? ` · ${word("Tamamlandı", "Completed")}`
-                        : ""}
-                </small>
-            </button>
-            <strong
-                className={
-                    item.kind === "income"
-                        ? "income-text"
-                        : item.kind === "expense"
-                          ? "expense-text"
-                          : ""
-                }
-            >
-                {isTx
-                    ? `${item.kind === "expense" ? "−" : "+"}${money(item.amountMinor)}`
-                    : ""}
-            </strong>
-            {isTask && (
-                <button
-                    className="row-edit"
-                    aria-label={`${word("Görevi düzenle", "Edit task")}: ${(item as Task).title}`}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit();
-                    }}
-                >
-                    <Edit2 size={15} />
-                </button>
-            )}
-            <button
-                className="row-delete"
-                aria-label={word("Kaydı sil", "Delete entry")}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete();
-                }}
-            >
-                <Trash2 size={15} />
-            </button>
         </div>
     );
 }

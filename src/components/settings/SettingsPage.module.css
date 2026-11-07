@@ -1,0 +1,71 @@
+.categoryLine .colorPicker {
+    margin-left: auto;
+}
+
+.colorPicker {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.colorTrigger {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 8px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--panel);
+    color: var(--text);
+    font-size: 10px;
+    font-weight: 650;
+}
+
+.colorTrigger:hover {
+    border-color: var(--accent);
+}
+
+.colorTrigger i,
+.colorMenu i {
+    display: block;
+    width: 18px;
+    height: 18px;
+    border: 1px solid color-mix(in srgb, var(--text), transparent 82%);
+    border-radius: 50%;
+}
+
+.colorMenu {
+    position: absolute;
+    z-index: 8;
+    top: calc(100% + 6px);
+    right: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 32px);
+    gap: 5px;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel);
+    box-shadow: var(--shadow);
+}
+
+.colorMenu button {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    background: transparent;
+}
+
+.colorMenu button:hover,
+.selectedColor {
+    border-color: var(--accent) !important;
+    background: var(--accent-light) !important;
+}
+
+.colorMenu i {
+    width: 19px;
+    height: 19px;
+}
