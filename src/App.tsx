@@ -42,10 +42,11 @@ import {
     type Transaction,
     type RecordKind,
 } from "./domain";
-import HabitsPage from "./features/habits/HabitsPage";
-import AssetsPage from "./features/assets/AssetsPage";
-import TodayEntriesPage from "./features/entries/TodayEntriesPage";
-import todayEntriesStyles from "./features/entries/TodayEntriesPage.module.css";
+import HabitsPage from "./components/habits/HabitsPage";
+import AssetsPage from "./components/assets/AssetsPage";
+import TodayEntriesPage from "./components/entries/TodayEntriesPage";
+import todayEntriesStyles from "./components/entries/TodayEntriesPage.module.css";
+import FinancePage from "./components/finance/FinancePage";
 import { t, type Language } from "./i18n";
 
 type Page =
@@ -601,14 +602,8 @@ function App() {
             (getDay(new Date(month.getFullYear(), month.getMonth(), 1)) + 6) %
             7;
     const monthTx = tx.filter((i) =>
-            i.localDate.startsWith(format(month, "yyyy-MM")),
-        ),
-        chartMax = Math.max(
-            1,
-            ...monthTx
-                .filter((i) => i.kind === "expense")
-                .map((i) => i.amountMinor),
-        );
+        i.localDate.startsWith(format(month, "yyyy-MM")),
+    );
 
     return (
         <div className="app-shell">
@@ -1048,209 +1043,35 @@ function App() {
                         </>
                     )}
                     {page === "finance" && (
-                        <>
-                            <div className="page-heading">
-                                <div>
-                                    <div className="eyebrow">
-                                        {text("PARANIN KONTROLÜ SENDE")}
-                                    </div>
-                                    <h1>{pageLabel("finance")}</h1>
-                                    <p>
-                                        {text(
-                                            "Gelir ve giderlerini kolayca takip et.",
-                                        )}
-                                    </p>
-                                </div>
-                                <button
-                                    className="primary"
-                                    onClick={() => open("expense")}
-                                >
-                                    <Plus size={18} />
-                                    {text("İşlem ekle")}
-                                </button>
-                            </div>
-                            <div className="summary-grid compact">
-                                <div className="summary-card">
-                                    <span>{text("Bu ay gider")}</span>
-                                    <strong>{amountText(monthSpent)}</strong>
-                                </div>
-                                <div className="summary-card">
-                                    <span>{text("Bu ay gelir")}</span>
-                                    <strong>
-                                        {amountText(
-                                            monthTx
-                                                .filter(
-                                                    (i) => i.kind === "income",
-                                                )
-                                                .reduce(
-                                                    (s, i) => s + i.amountMinor,
-                                                    0,
-                                                ),
-                                        )}
-                                    </strong>
-                                </div>
-                                <div className="summary-card">
-                                    <span>{text("Net durum")}</span>
-                                    <strong>
-                                        {balanceText(
-                                            monthTx
-                                                .filter(
-                                                    (i) => i.kind === "income",
-                                                )
-                                                .reduce(
-                                                    (s, i) => s + i.amountMinor,
-                                                    0,
-                                                ) - monthSpent,
-                                        )}
-                                    </strong>
-                                </div>
-                            </div>
-                            <div className="dashboard-grid finance-charts">
-                                <section className="panel">
-                                    <div className="panel-heading">
-                                        <div>
-                                            <h2>{text("Günlük harcamalar")}</h2>
-                                            <p>{fmtMonth(month)}</p>
-                                        </div>
-                                        <div className="month-nav">
-                                            <button
-                                                onClick={() =>
-                                                    setMonth(
-                                                        subMonths(month, 1),
-                                                    )
-                                                }
-                                            >
-                                                <ChevronLeft />
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    setMonth(
-                                                        addMonths(month, 1),
-                                                    )
-                                                }
-                                            >
-                                                <ChevronRight />
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="bars">
-                                        {Array.from(
-                                            { length: daysInMonth },
-                                            (_, i) => {
-                                                const d = `${format(month, "yyyy-MM")}-${String(i + 1).padStart(2, "0")}`,
-                                                    v = monthTx
-                                                        .filter(
-                                                            (x) =>
-                                                                x.kind ===
-                                                                    "expense" &&
-                                                                x.localDate ===
-                                                                    d,
-                                                        )
-                                                        .reduce(
-                                                            (s, x) =>
-                                                                s +
-                                                                x.amountMinor,
-                                                            0,
-                                                        );
-                                                return (
-                                                    <div
-                                                        className="bar-wrap"
-                                                        title={`${i + 1}: ${money(v)}`}
-                                                        key={d}
-                                                    >
-                                                        <div
-                                                            className="bar"
-                                                            style={{
-                                                                height: `${Math.max(v ? 4 : 1, (v / chartMax) * 100)}%`,
-                                                            }}
-                                                        />
-                                                        <small>
-                                                            {(i + 1) % 5 ===
-                                                                1 || i === 0
-                                                                ? i + 1
-                                                                : ""}
-                                                        </small>
-                                                    </div>
-                                                );
-                                            },
-                                        )}
-                                    </div>
-                                </section>
-                                <section className="panel">
-                                    <div className="panel-heading">
-                                        <div>
-                                            <h2>{text("Kategori dağılımı")}</h2>
-                                            <p>{text("Bu ayki harcamalar")}</p>
-                                        </div>
-                                    </div>
-                                    {categories.map((c) => {
-                                        const val = monthTx
-                                            .filter(
-                                                (i) =>
-                                                    i.kind === "expense" &&
-                                                    i.categoryId === c.id,
-                                            )
-                                            .reduce(
-                                                (s, i) => s + i.amountMinor,
-                                                0,
-                                            );
-                                        if (!val) return null;
-                                        return (
-                                            <div
-                                                className="category-line"
-                                                key={c.id}
-                                            >
-                                                <i
-                                                    style={{
-                                                        background: c.color,
-                                                    }}
-                                                />
-                                                <span>
-                                                    {categoryDisplay(
-                                                        c.name,
-                                                        language,
-                                                    )}
-                                                </span>
-                                                <b>{money(val)}</b>
-                                            </div>
-                                        );
-                                    })}
-                                    {monthSpent === 0 && (
-                                        <Empty
-                                            icon={<BarChart3 />}
-                                            title="Henüz harcama yok"
-                                            text="İşlemlerin burada görünecek."
-                                        />
-                                    )}
-                                </section>
-                            </div>
-                            <section className="panel">
-                                <div className="panel-heading">
-                                    <div>
-                                        <h2>{text("İşlem geçmişi")}</h2>
-                                        <p>
-                                            {text("Gelir ve gider kayıtların")}
-                                        </p>
-                                    </div>
-                                    <button
-                                        className="secondary"
-                                        onClick={exportCsv}
-                                    >
-                                        <Download size={16} /> CSV indir
-                                    </button>
-                                </div>
+                        <FinancePage
+                            categories={categories}
+                            language={language}
+                            month={month}
+                            monthSpent={monthSpent}
+                            monthTransactions={monthTx}
+                            onMonthChange={setMonth}
+                            onAddExpense={() => open("expense")}
+                            onExportCsv={exportCsv}
+                            expenseEmptyState={
+                                <Empty
+                                    icon={<BarChart3 />}
+                                    title="Henüz harcama yok"
+                                    text="İşlemlerin burada görünecek."
+                                />
+                            }
+                            transactionList={
                                 <RecordList
                                     language={language}
                                     items={filtered}
                                     categories={categories}
-                                    onEdit={(i) => open(i.kind, i)}
+                                    onEdit={(item) => open(item.kind, item)}
                                     onDelete={remove}
                                     query={query}
                                     setQuery={setQuery}
                                     finance
                                 />
-                            </section>
-                        </>
+                            }
+                        />
                     )}
                     {(page === "journal" || page === "tasks") && (
                         <>
