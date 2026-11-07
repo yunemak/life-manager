@@ -45,4 +45,4 @@ Drive API kotaları, Google hesabı depolama kotası ve OAuth consent-screen/tes
 
 ## Teknoloji
 
-React, TypeScript, Vite, Tailwind CSS, Dexie/IndexedDB, date-fns, Lucide, Recharts ve vite-plugin-pwa.
+React, TypeScript, Vite, Dexie/IndexedDB, date-fns, Lucide, Recharts ve vite-plugin-pwa.
