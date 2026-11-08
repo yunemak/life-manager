@@ -39,9 +39,9 @@ export default function useBackupActions(
         }
     };
 
-    const exportCsv = () => {
+    const exportCsv = async () => {
         try {
-            exportTransactionsCsv(transactions, categories, today);
+            await exportTransactionsCsv(transactions, categories, today);
         } catch (error) {
             notify(
                 error instanceof Error

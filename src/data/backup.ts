@@ -1,7 +1,32 @@
+import { Capacitor } from "@capacitor/core";
+import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
 import { db } from "../db";
 import type { Category, Transaction } from "../domain";
 
-function download(name: string, text: string, type: string) {
+async function download(name: string, text: string, type: string) {
+    if (Capacitor.isNativePlatform()) {
+        const { uri } = await Filesystem.writeFile({
+            path: name,
+            data: text,
+            directory: Directory.Cache,
+            encoding: Encoding.UTF8,
+        });
+        try {
+            await Share.share({
+                title: name,
+                files: [uri],
+                dialogTitle: name,
+            });
+        } finally {
+            await Filesystem.deleteFile({
+                path: name,
+                directory: Directory.Cache,
+            }).catch(() => undefined);
+        }
+        return;
+    }
+
     const anchor = document.createElement("a");
     anchor.href = URL.createObjectURL(new Blob([text], { type }));
     anchor.download = name;
@@ -130,7 +155,7 @@ export async function importJson(file: File) {
     });
 }
 
-export function exportCsv(
+export async function exportCsv(
     transactions: Transaction[],
     categories: Category[],
     today: string,
@@ -148,7 +173,7 @@ export function exportCsv(
         ]),
     ];
 
-    download(
+    await download(
         `finans-${today}.csv`,
         "\uFEFF" +
             rows

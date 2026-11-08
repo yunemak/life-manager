@@ -1,4 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { App as CapacitorApp } from "@capacitor/app";
+import { Capacitor } from "@capacitor/core";
+import { StatusBar, Style } from "@capacitor/status-bar";
 import { localDate, type Task, type Transaction } from "./domain";
 import AppLayout from "./components/layout/AppLayout";
 import AppPages from "./components/layout/AppPages";
@@ -35,6 +38,7 @@ function App() {
     const [query, setQuery] = useState("");
     const [moreOpen, setMoreOpen] = useState(false);
     const [financeMonth, setFinanceMonth] = useState(() => new Date());
+    const nativeBackAction = useRef<(() => void) | undefined>(undefined);
 
     const language = preferences.language;
     const text = (value: string) => t(value, language);
@@ -167,6 +171,56 @@ function App() {
         updateCategoryColor: categoryActions.changeColor,
         addCategory: categoryActions.openDialog,
     };
+
+    useEffect(() => {
+        nativeBackAction.current = () => {
+            if (entries.deleteCandidate) {
+                entries.cancelDelete();
+            } else if (entries.open) {
+                entries.close();
+            } else if (categoryActions.open) {
+                categoryActions.close();
+            } else if (moreOpen) {
+                setMoreOpen(false);
+            } else if (page !== "home") {
+                setPage("home");
+            } else {
+                void CapacitorApp.exitApp();
+            }
+        };
+    });
+
+    useEffect(() => {
+        if (!Capacitor.isNativePlatform()) return;
+
+        let cancelled = false;
+        let removeListener: (() => void) | undefined;
+        void CapacitorApp.addListener("backButton", () => {
+            nativeBackAction.current?.();
+        }).then((listener) => {
+            if (cancelled) {
+                void listener.remove();
+            } else {
+                removeListener = () => void listener.remove();
+            }
+        });
+
+        return () => {
+            cancelled = true;
+            removeListener?.();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!Capacitor.isNativePlatform()) return;
+        void StatusBar.setOverlaysWebView({ overlay: false });
+        void StatusBar.setStyle({
+            style: preferences.theme === "dark" ? Style.Dark : Style.Light,
+        });
+        void StatusBar.setBackgroundColor({
+            color: preferences.theme === "dark" ? "#151a18" : "#f7f9f7",
+        });
+    }, [preferences.theme]);
 
     return (
         <>

@@ -12,6 +12,9 @@ dist
 dev-dist
 dist-ssr
 *.local
+*.jks
+*.keystore
+key.properties
 
 # Editor directories and files
 .vscode/*

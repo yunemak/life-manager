@@ -796,8 +796,8 @@ button:disabled {
         margin: 0;
     }
     .topbar {
-        height: 58px;
-        padding: 0 17px;
+        height: calc(58px + env(safe-area-inset-top));
+        padding: env(safe-area-inset-top) 17px 0;
     }
     .mobile-brand {
         display: flex;

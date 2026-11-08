@@ -6,12 +6,21 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc -b && vite build",
+        "cap:sync": "npm run build && cap sync android",
+        "android:debug": "npm run cap:sync && cd android && ./gradlew assembleDebug",
+        "android:open": "cap open android",
         "lint": "oxlint src vite.config.ts",
         "preview": "vite preview",
         "test": "vitest run",
         "typecheck": "tsc -b --pretty"
     },
     "dependencies": {
+        "@capacitor/android": "^8.6.0",
+        "@capacitor/app": "^8.1.2",
+        "@capacitor/core": "^8.6.0",
+        "@capacitor/filesystem": "^8.1.5",
+        "@capacitor/share": "^8.0.3",
+        "@capacitor/status-bar": "^8.0.4",
         "date-fns": "^4.4.0",
         "dexie": "^4.4.7",
         "lucide-react": "^1.66.0",
@@ -20,6 +29,7 @@
         "recharts": "^3.10.1"
     },
     "devDependencies": {
+        "@capacitor/cli": "^8.6.0",
         "@testing-library/jest-dom": "^7.0.1",
         "@testing-library/react": "^16.3.3",
         "@types/node": "^24.19.2",

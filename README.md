@@ -25,6 +25,19 @@ npm run preview
 
 Uygulamayı HTTPS üzerinden yayımlayın (veya yerelde çalıştırın). Android Chrome'da menüden **Uygulamayı yükle / Ana ekrana ekle** seçilebilir. iPhone/iPad Safari'de paylaş menüsünü açıp **Ana Ekrana Ekle** seçin. Çevrimdışı uygulama kabuğu servis çalışanı tarafından önbelleğe alınır; kişisel kayıtlar servis çalışanı önbelleğine konmaz, IndexedDB'de kalır. PWA arka plan çalışması, özellikle iOS'ta sınırlıdır.
 
+## Android uygulaması
+
+Android uygulaması Capacitor ile aynı React arayüzünü paketler. Android Studio/SDK Platform 36, Android Build Tools 36 ve JDK 21 gerekir. APK oluşturmak ve Android Studio'da açmak için:
+
+```bash
+npm run android:debug
+npm run android:open
+```
+
+Debug APK: `android/app/build/outputs/apk/debug/app-debug.apk`. Telefona USB ile yüklemek için Android geliştirici seçeneklerinde USB hata ayıklamayı açıp `adb install -r android/app/build/outputs/apk/debug/app-debug.apk` çalıştırın; alternatif olarak dosyayı telefona kopyalayıp açın ve bilinmeyen uygulama yükleme izni verin. Bu debug APK imzası yalnızca kişisel test/yükleme içindir. Yayın sürümü için kendi keystore'unuzla imzalama yapılandırın; keystore ve parolaları depoya eklemeyin.
+
+Veriler Dexie/IndexedDB'de kalır; Android'e geçişte veritabanı şeması değişmez. Web sitesi ve Android uygulaması farklı tarayıcı origin'lerinde çalıştığı için web sürümündeki mevcut kayıtlar Android'e otomatik kopyalanmaz. Taşımak için web sürümünde JSON yedeği oluşturup Android uygulamasından içe aktarın. Uygulama güncellemeleri cihazdaki veriyi korur, ancak uygulamayı kaldırmak Android uygulama verilerini siler. Android yedeklemesi kapalıdır; veriyi cihazdan çıkarmak için Ayarlar'daki JSON yedeğini kullanın. Android'de JSON ve CSV dışa aktarımları sistem paylaşım menüsünü açar. İçe aktarma Android'in dosya seçicisini kullanır. APK uygulama içeriğini yerel olarak taşır ve normal kullanım için ağ bağlantısı gerekmez.
+
 ## Yedekleme
 
 Ayarlar'dan sürümlü JSON yedeği indirip daha sonra birleştirme ya da yerini alma onayıyla içe aktarabilirsiniz. Finans CSV'si TRY miktarlarını kuruş cinsinden dışa aktarır. Yedek dosyalarını güvenli bir yerde saklayın; tarayıcı/site verilerinin silinmesi yerel verileri silebilir.
