@@ -14,7 +14,7 @@ interface CalendarPageProps {
     offset: number;
     today: string;
     selectedDate: string;
-    datesWithEntries: string[];
+    datesWithEntries: ReadonlySet<string>;
     onPreviousMonth: () => void;
     onNextMonth: () => void;
     onSelectDate: (date: string) => void;
@@ -85,7 +85,7 @@ export default function CalendarPage({
                         const day = String(index + 1).padStart(2, "0");
                         const date = `${format(month, "yyyy-MM")}-${day}`;
                         const selected = selectedDate === date;
-                        const hasEntries = datesWithEntries.includes(date);
+                        const hasEntries = datesWithEntries.has(date);
 
                         return (
                             <button

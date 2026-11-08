@@ -56,6 +56,7 @@ const colors = [
     "#bd9b3b",
     "#65758b",
 ];
+const nowIso = () => new Date().toISOString();
 type FrequencyForm = "daily" | "weekly" | "monthly";
 
 interface Props {
@@ -82,7 +83,7 @@ export default function HabitsPage({
         [selected, setSelected] = useState<Habit | null>(null),
         [editing, setEditing] = useState<Habit | null>(null),
         [formOpen, setFormOpen] = useState(false);
-    const [month, setMonth] = useState(new Date()),
+    const [month, setMonth] = useState(() => new Date()),
         [selectedDay, setSelectedDay] = useState(today),
         [menu, setMenu] = useState<string | null>(null);
     const load = useCallback(async () => {
@@ -99,9 +100,13 @@ export default function HabitsPage({
             current ? (all.find((h) => h.id === current.id) ?? null) : null,
         );
     }, []);
+    const reportLoadError = useCallback(
+        () => onNotice(t("Alışkanlıklar yüklenemedi.", language)),
+        [language, onNotice],
+    );
     useEffect(() => {
-        void load();
-    }, [load]);
+        void load().catch(reportLoadError);
+    }, [load, reportLoadError]);
     const visible = habits.filter((h) => h.archived === archivedView);
     const dates = useMemo(
         () => Array.from({ length: 14 }, (_, i) => shiftDay(today, i - 13)),
@@ -117,22 +122,29 @@ export default function HabitsPage({
             (c) => c.habitId === habit.id && c.localDate === date,
         );
         const id = matches[0]?.id ?? `${habit.id}::${date}`;
-        if (status)
-            await db.completions.put({
-                id,
-                habitId: habit.id,
-                localDate: date,
-                status,
-                createdAt: matches[0]?.createdAt ?? new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-            });
-        else await Promise.all(matches.map((c) => db.completions.delete(c.id)));
-        if (status && matches.length > 1)
-            await Promise.all(
-                matches.slice(1).map((c) => db.completions.delete(c.id)),
-            );
-        await load();
-        await onRefresh();
+        try {
+            if (status)
+                await db.completions.put({
+                    id,
+                    habitId: habit.id,
+                    localDate: date,
+                    status,
+                    createdAt: matches[0]?.createdAt ?? nowIso(),
+                    updatedAt: nowIso(),
+                });
+            else
+                await Promise.all(
+                    matches.map((c) => db.completions.delete(c.id)),
+                );
+            if (status && matches.length > 1)
+                await Promise.all(
+                    matches.slice(1).map((c) => db.completions.delete(c.id)),
+                );
+            await load();
+            await onRefresh();
+        } catch {
+            onNotice(text("Alışkanlık durumu güncellenemedi."));
+        }
     };
     const editHabit = (habit?: Habit) => {
         setMenu(null);
@@ -166,7 +178,7 @@ export default function HabitsPage({
                   }
                 : {}),
         };
-        const now = new Date().toISOString(),
+        const now = nowIso(),
             id = editing?.id ?? uid();
         const habit: Habit = {
             id,
@@ -181,31 +193,41 @@ export default function HabitsPage({
             createdAt: editing?.createdAt ?? now,
             updatedAt: now,
         };
-        await db.habits.put(habit);
-        setFormOpen(false);
-        setEditing(null);
-        await load();
-        await onRefresh();
-        onNotice(
-            text(editing ? "Alışkanlık güncellendi." : "Alışkanlık eklendi."),
-        );
+        try {
+            await db.habits.put(habit);
+            setFormOpen(false);
+            setEditing(null);
+            await load();
+            await onRefresh();
+            onNotice(
+                text(
+                    editing ? "Alışkanlık güncellendi." : "Alışkanlık eklendi.",
+                ),
+            );
+        } catch {
+            onNotice(text("Alışkanlık kaydedilemedi."));
+        }
     };
     const archiveHabit = async (habit: Habit) => {
-        await db.habits.put({
-            ...habit,
-            archived: !habit.archived,
-            updatedAt: new Date().toISOString(),
-        });
-        setMenu(null);
-        await load();
-        await onRefresh();
-        onNotice(
-            text(
-                habit.archived
-                    ? "Alışkanlık arşivden çıkarıldı."
-                    : "Alışkanlık arşivlendi.",
-            ),
-        );
+        try {
+            await db.habits.put({
+                ...habit,
+                archived: !habit.archived,
+                updatedAt: nowIso(),
+            });
+            setMenu(null);
+            await load();
+            await onRefresh();
+            onNotice(
+                text(
+                    habit.archived
+                        ? "Alışkanlık arşivden çıkarıldı."
+                        : "Alışkanlık arşivlendi.",
+                ),
+            );
+        } catch {
+            onNotice(text("Alışkanlık güncellenemedi."));
+        }
     };
     const deleteHabit = async (habit: Habit) => {
         if (
@@ -216,15 +238,19 @@ export default function HabitsPage({
             )
         )
             return;
-        await db.transaction("rw", db.habits, db.completions, async () => {
-            await db.habits.delete(habit.id);
-            await db.completions.where("habitId").equals(habit.id).delete();
-        });
-        setMenu(null);
-        setSelected(null);
-        await load();
-        await onRefresh();
-        onNotice(text("Alışkanlık ve geçmişi silindi."));
+        try {
+            await db.transaction("rw", db.habits, db.completions, async () => {
+                await db.habits.delete(habit.id);
+                await db.completions.where("habitId").equals(habit.id).delete();
+            });
+            setMenu(null);
+            setSelected(null);
+            await load();
+            await onRefresh();
+            onNotice(text("Alışkanlık ve geçmişi silindi."));
+        } catch {
+            onNotice(text("Alışkanlık silinemedi."));
+        }
     };
 
     if (selected) {

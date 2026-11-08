@@ -24,6 +24,7 @@ interface AppLayoutProps {
     page: Page;
     language: Language;
     theme: string;
+    today: string;
     moreOpen: boolean;
     contentClassName?: string;
     pageLabel: (page: Page) => string;
@@ -60,6 +61,7 @@ export default function AppLayout({
     page,
     language,
     theme,
+    today,
     moreOpen,
     contentClassName = "",
     pageLabel,
@@ -114,7 +116,7 @@ export default function AppLayout({
                         <b>{pageLabel(page)}</b>
                     </div>
                     <div className="top-date">
-                        {format(new Date(), "EEEE, d MMMM", {
+                        {format(new Date(`${today}T12:00:00`), "EEEE, d MMMM", {
                             locale: language === "en" ? undefined : tr,
                         })}
                     </div>

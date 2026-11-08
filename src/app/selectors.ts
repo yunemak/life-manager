@@ -7,20 +7,22 @@ import {
 import type { Page } from "./types";
 import type { Language } from "../i18n";
 
+function matchesQuery(item: Entry, normalizedQuery: string) {
+    return (
+        !normalizedQuery ||
+        JSON.stringify(item).toLocaleLowerCase("tr").includes(normalizedQuery)
+    );
+}
+
 export function selectTodayEntries(
     items: Entry[],
     today: string,
     query: string,
 ) {
+    const normalizedQuery = query.toLocaleLowerCase("tr");
     return items
         .filter((item) => item.localDate === today)
-        .filter(
-            (item) =>
-                !query ||
-                JSON.stringify(item)
-                    .toLocaleLowerCase("tr")
-                    .includes(query.toLocaleLowerCase("tr")),
-        )
+        .filter((item) => matchesQuery(item, normalizedQuery))
         .sort(
             (a, b) =>
                 new Date(entryTimestamp(b)).getTime() -
@@ -29,6 +31,7 @@ export function selectTodayEntries(
 }
 
 export function selectPageEntries(items: Entry[], page: Page, query: string) {
+    const normalizedQuery = query.toLocaleLowerCase("tr");
     return items
         .filter((item) => {
             if (page === "finance")
@@ -38,13 +41,7 @@ export function selectPageEntries(items: Entry[], page: Page, query: string) {
             if (page === "tasks") return item.kind === "task";
             return true;
         })
-        .filter(
-            (item) =>
-                !query ||
-                JSON.stringify(item)
-                    .toLocaleLowerCase("tr")
-                    .includes(query.toLocaleLowerCase("tr")),
-        );
+        .filter((item) => matchesQuery(item, normalizedQuery));
 }
 
 export function selectTransactionTotals(
@@ -84,16 +81,21 @@ export function selectCategoryTotals(
     kind: Transaction["kind"],
     language: Language,
 ) {
+    const totalsByCategory = new Map<string, number>();
+    for (const transaction of transactions) {
+        if (transaction.kind === kind) {
+            totalsByCategory.set(
+                transaction.categoryId,
+                (totalsByCategory.get(transaction.categoryId) ?? 0) +
+                    transaction.amountMinor,
+            );
+        }
+    }
+
     return categories
         .filter((category) => category.kind === kind)
         .map((category) => {
-            const total = transactions
-                .filter(
-                    (transaction) =>
-                        transaction.kind === kind &&
-                        transaction.categoryId === category.id,
-                )
-                .reduce((sum, transaction) => sum + transaction.amountMinor, 0);
+            const total = totalsByCategory.get(category.id) ?? 0;
             return {
                 id: category.id,
                 name: categoryDisplay(category.name, language),

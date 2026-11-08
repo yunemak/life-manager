@@ -6,7 +6,7 @@ import {
     ChevronRight,
     FileText,
 } from "lucide-react";
-import { format, addMonths, subMonths } from "date-fns";
+import { format, addMonths, subMonths, parseISO } from "date-fns";
 import { tr } from "date-fns/locale";
 import {
     money,
@@ -71,11 +71,11 @@ interface AppPagesData {
     completions: string[];
     todayEntries: Entry[];
     todaysTasks: Task[];
-    transactions: Transaction[];
     todaySpent: number;
     todayIncome: number;
     monthSpent: number;
     monthIncome: number;
+    financeMonthSpent: number;
     filtered: Entry[];
     daysInMonth: number;
     offset: number;
@@ -152,6 +152,7 @@ export default function AppPages({
         todayIncome,
         monthSpent,
         monthIncome,
+        financeMonthSpent,
         filtered,
         daysInMonth,
         offset,
@@ -176,19 +177,20 @@ export default function AppPages({
         format(date, "MMMM yyyy", {
             locale: language === "en" ? undefined : tr,
         });
+    const todayDate = parseISO(today);
 
     return (
         <>
             {page === "home" && (
                 <HomePage
                     language={language}
-                    dateLabel={format(new Date(), "EEEE, d MMMM yyyy", {
+                    dateLabel={format(todayDate, "EEEE, d MMMM yyyy", {
                         locale: language === "en" ? undefined : tr,
                     })}
                     monthLabel={
                         language === "en"
-                            ? `${format(new Date(), "MMMM")} total`
-                            : `${format(new Date(), "MMMM", { locale: tr })} toplamı`
+                            ? `${format(todayDate, "MMMM")} total`
+                            : `${format(todayDate, "MMMM", { locale: tr })} toplamı`
                     }
                     todaySpent={todaySpent}
                     todayIncome={todayIncome}
@@ -258,11 +260,9 @@ export default function AppPages({
                             ? "Back to overview"
                             : "Genel bakışa dön"
                     }
-                    dateLabel={format(
-                        new Date(`${today}T12:00:00`),
-                        "EEEE, d MMMM yyyy",
-                        { locale: language === "en" ? undefined : tr },
-                    )}
+                    dateLabel={format(todayDate, "EEEE, d MMMM yyyy", {
+                        locale: language === "en" ? undefined : tr,
+                    })}
                     title={pageLabel("dayEntries")}
                     countLabel={
                         language === "en"
@@ -297,7 +297,9 @@ export default function AppPages({
                     offset={offset}
                     today={today}
                     selectedDate={selectedDate}
-                    datesWithEntries={items.map((item) => item.localDate)}
+                    datesWithEntries={
+                        new Set(items.map((item) => item.localDate))
+                    }
                     onPreviousMonth={() =>
                         setCalendarMonth(subMonths(calendarMonth, 1))
                     }
@@ -324,7 +326,7 @@ export default function AppPages({
                     categories={categories}
                     language={language}
                     month={financeMonth}
-                    monthSpent={monthSpent}
+                    monthSpent={financeMonthSpent}
                     monthTransactions={monthTransactions}
                     onMonthChange={setFinanceMonth}
                     onAddExpense={() => open("expense")}

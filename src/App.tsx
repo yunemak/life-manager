@@ -30,7 +30,7 @@ function App() {
     );
     const { items, categories, habits, completions, refresh } =
         useAppData(handleLoadError);
-    const calendar = useCalendarState();
+    const calendar = useCalendarState(handleLoadError);
     const [page, setPage] = useState<Page>("home");
     const [query, setQuery] = useState("");
     const [moreOpen, setMoreOpen] = useState(false);
@@ -44,34 +44,51 @@ function App() {
             : text(pageLabels[target]);
     const today = localDate();
     const monthPrefix = today.slice(0, 7);
+    const financeMonthPrefix = localDate(financeMonth).slice(0, 7);
     const entries = useEntryWorkflow(page, today, refresh, notify, text);
     const transactions = items.filter(
         (item): item is Transaction =>
             item.kind === "expense" || item.kind === "income",
     );
-    const todayEntries = selectTodayEntries(items, today, query);
-    const pendingTasks = items.filter(
-        (item): item is Task =>
-            item.localDate === today && item.kind === "task" && !item.completed,
-    );
+    const todayEntries =
+        page === "dayEntries" ? selectTodayEntries(items, today, query) : [];
+    const pendingTasks =
+        page === "home"
+            ? items.filter(
+                  (item): item is Task =>
+                      item.localDate === today &&
+                      item.kind === "task" &&
+                      !item.completed,
+              )
+            : [];
     const { todaySpent, todayIncome, monthSpent, monthIncome } =
         selectTransactionTotals(transactions, today, monthPrefix);
-    const filtered = selectPageEntries(items, page, query);
+    const filtered = ["finance", "journal", "tasks"].includes(page)
+        ? selectPageEntries(items, page, query)
+        : [];
     const monthTransactions = selectMonthTransactions(
         transactions,
         financeMonth,
     );
+    const currentMonthTransactions = transactions.filter((item) =>
+        item.localDate.startsWith(monthPrefix),
+    );
     const incomeCategories = selectCategoryTotals(
         categories,
-        monthTransactions,
+        currentMonthTransactions,
         "income",
         language,
     );
     const expenseCategories = selectCategoryTotals(
         categories,
-        monthTransactions,
+        currentMonthTransactions,
         "expense",
         language,
+    );
+    const financeTotals = selectTransactionTotals(
+        transactions,
+        "",
+        financeMonthPrefix,
     );
     const backup = useBackupActions(
         today,
@@ -125,11 +142,11 @@ function App() {
         completions,
         todayEntries,
         todaysTasks: pendingTasks,
-        transactions,
         todaySpent,
         todayIncome,
         monthSpent,
         monthIncome,
+        financeMonthSpent: financeTotals.monthSpent,
         filtered,
         daysInMonth,
         offset,
@@ -157,6 +174,7 @@ function App() {
                 page={page}
                 language={language}
                 theme={preferences.theme}
+                today={today}
                 moreOpen={moreOpen}
                 contentClassName={
                     page === "dayEntries" ? todayEntriesStyles.content : ""

@@ -2,6 +2,7 @@
 import "fake-indexeddb/auto";
 import "@testing-library/jest-dom/vitest";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { subMonths } from "date-fns";
 import {
     cleanup,
     fireEvent,
@@ -23,6 +24,115 @@ afterEach(async () => {
 });
 
 describe("finance workflow", () => {
+    it("keeps finance totals aligned with the selected month", async () => {
+        const now = new Date();
+        const today = localDate(now);
+        const previousMonth = localDate(subMonths(now, 1));
+        const timestamp = now.toISOString();
+        await db.transactions.bulkAdd([
+            {
+                id: "current-month-expense",
+                kind: "expense",
+                amountMinor: 4321,
+                categoryId: "food",
+                description: "Current month expense",
+                occurredAt: `${today}T09:00`,
+                localDate: today,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            },
+            {
+                id: "previous-month-expense",
+                kind: "expense",
+                amountMinor: 1250,
+                categoryId: "food",
+                description: "Previous month expense",
+                occurredAt: `${previousMonth}T09:00`,
+                localDate: previousMonth,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            },
+        ]);
+
+        const { container } = render(<App />);
+        await screen.findByText("Merhaba 👋");
+        fireEvent.click(screen.getAllByRole("button", { name: "Finans" })[0]);
+        const summary = container.querySelector(".summary-grid");
+        expect(summary).not.toBeNull();
+        expect(
+            await within(summary as HTMLElement).findByText("₺43,21"),
+        ).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole("button", { name: "Önceki ay" }));
+        expect(
+            await within(summary as HTMLElement).findByText("₺12,50"),
+        ).toBeInTheDocument();
+        expect(
+            within(summary as HTMLElement).queryByText("₺43,21"),
+        ).not.toBeInTheDocument();
+    });
+
+    it("counts only distinct completions for active habits in today’s statistics", async () => {
+        const today = localDate();
+        const timestamp = new Date().toISOString();
+        await db.habits.bulkAdd([
+            {
+                id: "active-stat-habit",
+                kind: "habit",
+                title: "Active habit",
+                schedule: [0, 1, 2, 3, 4, 5, 6],
+                archived: false,
+                localDate: today,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            },
+            {
+                id: "archived-stat-habit",
+                kind: "habit",
+                title: "Archived habit",
+                schedule: [0, 1, 2, 3, 4, 5, 6],
+                archived: true,
+                localDate: today,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            },
+        ]);
+        await db.completions.bulkAdd([
+            {
+                id: "active-completion-one",
+                habitId: "active-stat-habit",
+                localDate: today,
+                status: "completed",
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            },
+            {
+                id: "active-completion-duplicate",
+                habitId: "active-stat-habit",
+                localDate: today,
+                status: "completed",
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            },
+            {
+                id: "archived-completion",
+                habitId: "archived-stat-habit",
+                localDate: today,
+                status: "completed",
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            },
+        ]);
+
+        render(<App />);
+        await screen.findByText("Merhaba 👋");
+        fireEvent.click(screen.getByRole("button", { name: "Daha" }));
+        fireEvent.click(
+            screen.getAllByRole("button", { name: "İstatistikler" }).at(-1)!,
+        );
+        expect(await screen.findByText("1 / 1 tamamlandı")).toBeInTheDocument();
+    });
+
     it("sorts transaction history by entry time, newest first", async () => {
         const date = localDate();
         const timestamp = new Date().toISOString();
@@ -609,10 +719,12 @@ describe("finance workflow", () => {
         );
         const financeDialog = screen.getByRole("dialog");
         expect(
-            within(financeDialog).getByRole("option", { name: "Food" }),
+            await within(financeDialog).findByRole("option", { name: "Food" }),
         ).toBeInTheDocument();
         expect(
-            within(financeDialog).getByRole("option", { name: "Transport" }),
+            await within(financeDialog).findByRole("option", {
+                name: "Transport",
+            }),
         ).toBeInTheDocument();
         fireEvent.click(
             within(financeDialog).getByRole("button", { name: "Close" }),

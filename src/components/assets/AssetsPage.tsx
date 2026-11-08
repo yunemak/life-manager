@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+    type FormEvent,
+} from "react";
 import {
     ArrowLeft,
     Coins,
@@ -121,10 +127,23 @@ const turkishText: Record<string, string> = {
     Cancel: "Vazgeç",
     "Save changes": "Değişiklikleri kaydet",
 };
+const assetText = (value: string, language: Language) =>
+    language === "en" ? t(value, language) : (turkishText[value] ?? value);
 
 export default function AssetsPage({ language, onNotice }: Props) {
-    const text = (value: string) =>
-        language === "en" ? t(value, language) : (turkishText[value] ?? value);
+    const text = (value: string) => assetText(value, language);
+    const reportError = useCallback(
+        (error: unknown) =>
+            onNotice(
+                assetText(
+                    error instanceof Error
+                        ? error.message
+                        : "An unexpected database error occurred.",
+                    language,
+                ),
+            ),
+        [language, onNotice],
+    );
     const [holdings, setHoldings] = useState<AssetHolding[]>([]);
     const [assetTypes, setAssetTypes] = useState<AssetType[]>([]);
     const [selectedKey, setSelectedKey] = useState<string | null>(null);
@@ -251,8 +270,8 @@ export default function AssetsPage({ language, onNotice }: Props) {
         );
     };
     useEffect(() => {
-        void load();
-    }, []);
+        void load().catch(reportError);
+    }, [reportError]);
     const groups = useMemo(() => {
         const map = new Map<string, AssetGroup>();
         for (const holding of holdings) {
@@ -485,7 +504,12 @@ export default function AssetsPage({ language, onNotice }: Props) {
                                 setEditingType(null);
                         }}
                     >
-                        <form className={styles.form} onSubmit={saveType}>
+                        <form
+                            className={styles.form}
+                            onSubmit={(event) => {
+                                void saveType(event).catch(reportError);
+                            }}
+                        >
                             <header>
                                 <div>
                                     <div className="eyebrow">
@@ -563,7 +587,9 @@ export default function AssetsPage({ language, onNotice }: Props) {
                                 ) && (
                                     <button
                                         className="danger-button"
-                                        onClick={() => void removeType()}
+                                        onClick={() =>
+                                            void removeType().catch(reportError)
+                                        }
                                     >
                                         <Trash2 size={15} />
                                         {text("Delete")}
@@ -784,19 +810,22 @@ export default function AssetsPage({ language, onNotice }: Props) {
                         assetTypes={assetTypes}
                         typeLabel={typeLabel}
                         onCreateType={createType}
+                        onError={reportError}
                         initialType={selected.name}
                         onClose={() => {
                             setFormOpen(false);
                             setEditing(null);
                         }}
-                        onSubmit={save}
+                        onSubmit={(event) => {
+                            void save(event).catch(reportError);
+                        }}
                     />
                 )}
                 {deleteTarget && (
                     <DeleteDialog
                         language={language}
                         onCancel={() => setDeleteTarget(null)}
-                        onConfirm={() => void remove()}
+                        onConfirm={() => void remove().catch(reportError)}
                     />
                 )}
             </section>
@@ -885,18 +914,21 @@ export default function AssetsPage({ language, onNotice }: Props) {
                     assetTypes={assetTypes}
                     typeLabel={typeLabel}
                     onCreateType={createType}
+                    onError={reportError}
                     onClose={() => {
                         setFormOpen(false);
                         setEditing(null);
                     }}
-                    onSubmit={save}
+                    onSubmit={(event) => {
+                        void save(event).catch(reportError);
+                    }}
                 />
             )}
             {deleteTarget && (
                 <DeleteDialog
                     language={language}
                     onCancel={() => setDeleteTarget(null)}
-                    onConfirm={() => void remove()}
+                    onConfirm={() => void remove().catch(reportError)}
                 />
             )}
         </section>
@@ -909,6 +941,7 @@ function AssetForm({
     assetTypes,
     typeLabel,
     onCreateType,
+    onError,
     initialType = "",
     onClose,
     onSubmit,
@@ -918,6 +951,7 @@ function AssetForm({
     assetTypes: AssetType[];
     typeLabel: (name: string) => string;
     onCreateType: (name: string) => Promise<string | null>;
+    onError: (error: unknown) => void;
     initialType?: string;
     onClose: () => void;
     onSubmit: (event: FormEvent<HTMLFormElement>) => void;
@@ -1011,7 +1045,7 @@ function AssetForm({
                         <button
                             type="button"
                             className="secondary"
-                            onClick={() => void addType()}
+                            onClick={() => void addType().catch(onError)}
                         >
                             {text("Create type")}
                         </button>

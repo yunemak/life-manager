@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { db, records } from "../db";
 import {
     localDate,
@@ -44,8 +44,10 @@ export default function useAppData(onLoadError?: (error: unknown) => void) {
     const [categories, setCategories] = useState<Category[]>([]);
     const [habits, setHabits] = useState<Habit[]>([]);
     const [completions, setCompletions] = useState<string[]>([]);
+    const refreshVersion = useRef(0);
 
     const refresh = useCallback(async () => {
+        const version = ++refreshVersion.current;
         await ensureDefaultCategories();
         const [all, cats, allHabits, done] = await Promise.all([
             records.all(),
@@ -53,14 +55,23 @@ export default function useAppData(onLoadError?: (error: unknown) => void) {
             db.habits.toArray(),
             db.completions.where("localDate").equals(localDate()).toArray(),
         ]);
+        if (version !== refreshVersion.current) return;
         setItems(all.sort((a, b) => b.localDate.localeCompare(a.localDate)));
         setCategories(cats);
-        setHabits(allHabits.filter((habit) => !habit.archived));
-        setCompletions(
-            done
-                .filter((completion) => completion.status !== "skipped")
-                .map((completion) => completion.habitId),
-        );
+        const activeHabits = allHabits.filter((habit) => !habit.archived);
+        setHabits(activeHabits);
+        const activeHabitIds = new Set(activeHabits.map((habit) => habit.id));
+        setCompletions([
+            ...new Set(
+                done
+                    .filter(
+                        (completion) =>
+                            completion.status !== "skipped" &&
+                            activeHabitIds.has(completion.habitId),
+                    )
+                    .map((completion) => completion.habitId),
+            ),
+        ]);
     }, []);
 
     useEffect(() => {

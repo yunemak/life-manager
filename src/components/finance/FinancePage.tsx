@@ -32,15 +32,27 @@ export default function FinancePage({
     transactionList,
 }: FinancePageProps) {
     const text = (value: string) => t(value, language);
-    const monthIncome = monthTransactions
-        .filter((item) => item.kind === "income")
-        .reduce((sum, item) => sum + item.amountMinor, 0);
-    const chartMax = Math.max(
-        1,
-        ...monthTransactions
-            .filter((item) => item.kind === "expense")
-            .map((item) => item.amountMinor),
-    );
+    let monthIncome = 0;
+    let chartMax = 1;
+    const expensesByDay = new Map<string, number>();
+    const expensesByCategory = new Map<string, number>();
+    for (const transaction of monthTransactions) {
+        if (transaction.kind === "income") {
+            monthIncome += transaction.amountMinor;
+            continue;
+        }
+        chartMax = Math.max(chartMax, transaction.amountMinor);
+        expensesByDay.set(
+            transaction.localDate,
+            (expensesByDay.get(transaction.localDate) ?? 0) +
+                transaction.amountMinor,
+        );
+        expensesByCategory.set(
+            transaction.categoryId,
+            (expensesByCategory.get(transaction.categoryId) ?? 0) +
+                transaction.amountMinor,
+        );
+    }
     const monthLabel = format(month, "MMMM yyyy", {
         locale: language === "en" ? undefined : tr,
     });
@@ -107,16 +119,7 @@ export default function FinancePage({
                             { length: getDaysInMonth(month) },
                             (_, index) => {
                                 const date = `${format(month, "yyyy-MM")}-${String(index + 1).padStart(2, "0")}`;
-                                const value = monthTransactions
-                                    .filter(
-                                        (item) =>
-                                            item.kind === "expense" &&
-                                            item.localDate === date,
-                                    )
-                                    .reduce(
-                                        (sum, item) => sum + item.amountMinor,
-                                        0,
-                                    );
+                                const value = expensesByDay.get(date) ?? 0;
 
                                 return (
                                     <div
@@ -151,13 +154,7 @@ export default function FinancePage({
                         </div>
                     </div>
                     {categories.map((category) => {
-                        const value = monthTransactions
-                            .filter(
-                                (item) =>
-                                    item.kind === "expense" &&
-                                    item.categoryId === category.id,
-                            )
-                            .reduce((sum, item) => sum + item.amountMinor, 0);
+                        const value = expensesByCategory.get(category.id) ?? 0;
                         if (!value) return null;
 
                         return (

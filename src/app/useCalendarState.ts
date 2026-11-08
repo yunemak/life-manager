@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { localDate } from "../domain";
 import { getCompletedHabitIds } from "../data/habits";
 
-export default function useCalendarState() {
+export default function useCalendarState(
+    onLoadError?: (error: unknown) => void,
+) {
     const [month, setMonth] = useState(() => new Date());
     const [selectedDate, setSelectedDate] = useState(localDate);
     const [completedHabitIds, setCompletedHabitIds] = useState<string[]>([]);
@@ -13,14 +15,17 @@ export default function useCalendarState() {
             .then((habitIds) => {
                 if (active) setCompletedHabitIds(habitIds);
             })
-            .catch(() => {
-                if (active) setCompletedHabitIds([]);
+            .catch((error: unknown) => {
+                if (active) {
+                    setCompletedHabitIds([]);
+                    onLoadError?.(error);
+                }
             });
 
         return () => {
             active = false;
         };
-    }, [selectedDate]);
+    }, [selectedDate, onLoadError]);
 
     return {
         month,
