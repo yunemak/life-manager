@@ -21,7 +21,7 @@ export default function JournalTasksPage({
     const text = (value: string) => t(value, language);
 
     return (
-        <div className={styles.root}>
+        <div>
             <div className="page-heading">
                 <div>
                     <div className="eyebrow">
@@ -42,7 +42,7 @@ export default function JournalTasksPage({
                     <Plus size={18} /> {text("Ekle")}
                 </button>
             </div>
-            <section className={`panel ${isTasks ? "tasks-panel" : ""}`}>
+            <section className={`panel ${isTasks ? styles.tasksPanel : ""}`}>
                 {children}
             </section>
         </div>

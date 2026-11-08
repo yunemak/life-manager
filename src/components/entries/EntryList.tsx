@@ -48,6 +48,7 @@ export function RecordList({
     finance = false,
     language = "tr",
     showTimestamp = false,
+    moduleClasses,
 }: {
     items: Entry[];
     categories: Category[];
@@ -59,6 +60,15 @@ export function RecordList({
     finance?: boolean;
     language?: Language;
     showTimestamp?: boolean;
+    moduleClasses?: {
+        layout?: string;
+        tools?: string;
+        list?: string;
+        row?: string;
+        taskPriorityHigh?: string;
+        taskPriorityMedium?: string;
+        taskPriorityLow?: string;
+    };
 }) {
     const list = finance
         ? items
@@ -72,8 +82,8 @@ export function RecordList({
     const word = (trText: string, enText: string) =>
         language === "en" ? enText : trText;
     return (
-        <div className="record-list-layout">
-            <div className="list-tools">
+        <div className={`record-list-layout ${moduleClasses?.layout ?? ""}`}>
+            <div className={`list-tools ${moduleClasses?.tools ?? ""}`}>
                 <div className="search-box">
                     <Search size={17} />
                     <input
@@ -106,22 +116,41 @@ export function RecordList({
                     </select>
                 )}
             </div>
-            <div className="record-list">
+            <div className={`record-list ${moduleClasses?.list ?? ""}`}>
                 {list.length ? (
-                    list.map((i) => (
-                        <RecordRow
-                            key={i.id}
-                            item={i}
-                            categories={categories}
-                            language={language}
-                            showTimestamp={showTimestamp}
-                            onEdit={() => onEdit(i)}
-                            onDelete={() => onDelete(i)}
-                            onToggleTask={
-                                onToggleTask ? () => onToggleTask(i) : undefined
-                            }
-                        />
-                    ))
+                    list.map((i) => {
+                        const taskPriorityClass =
+                            i.kind !== "task"
+                                ? ""
+                                : i.priority === "high"
+                                  ? moduleClasses?.taskPriorityHigh
+                                  : i.priority === "medium"
+                                    ? moduleClasses?.taskPriorityMedium
+                                    : moduleClasses?.taskPriorityLow;
+
+                        return (
+                            <RecordRow
+                                key={i.id}
+                                item={i}
+                                categories={categories}
+                                language={language}
+                                showTimestamp={showTimestamp}
+                                className={[
+                                    moduleClasses?.row,
+                                    taskPriorityClass,
+                                ]
+                                    .filter(Boolean)
+                                    .join(" ")}
+                                onEdit={() => onEdit(i)}
+                                onDelete={() => onDelete(i)}
+                                onToggleTask={
+                                    onToggleTask
+                                        ? () => onToggleTask(i)
+                                        : undefined
+                                }
+                            />
+                        );
+                    })
                 ) : (
                     <Empty
                         icon={<Search />}
@@ -144,6 +173,7 @@ export function RecordRow({
     onToggleTask,
     language = "tr",
     showTimestamp = false,
+    className = "",
 }: {
     item: Entry;
     categories: Category[];
@@ -152,6 +182,7 @@ export function RecordRow({
     onToggleTask?: () => void;
     language?: Language;
     showTimestamp?: boolean;
+    className?: string;
 }) {
     const isTx = item.kind === "expense" || item.kind === "income",
         isTask = item.kind === "task",
@@ -160,7 +191,7 @@ export function RecordRow({
         language === "en" ? enText : trText;
     return (
         <div
-            className={`record-row ${task ? `task-priority-${task.priority}` : ""} ${task?.completed ? "task-completed" : ""}`}
+            className={`record-row ${className} ${task ? `task-priority-${task.priority}` : ""} ${task?.completed ? "task-completed" : ""}`}
         >
             {task && onToggleTask ? (
                 <button

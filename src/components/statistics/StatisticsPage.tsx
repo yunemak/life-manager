@@ -54,7 +54,7 @@ export default function StatisticsPage({
     const text = (value: string) => t(value, language);
 
     return (
-        <div className={styles.root}>
+        <div>
             <div className="page-heading">
                 <div>
                     <div className="eyebrow">{text("KENDİNİ KEŞFET")}</div>
@@ -103,18 +103,18 @@ export default function StatisticsPage({
                     {emptyExpenses}
                 </section>
             </div>
-            <div className="summary-grid stats-secondary">
-                <div className="summary-card">
+            <div className={`summary-grid ${styles.statsSecondary}`}>
+                <div className={`summary-card ${styles.summaryCard}`}>
                     <span>{text("Bu ay kayıt")}</span>
                     <strong>{monthEntries}</strong>
                     <small>{text("Günlük kayıtların toplamı")}</small>
                 </div>
-                <div className="summary-card">
+                <div className={`summary-card ${styles.summaryCard}`}>
                     <span>{text("Bugün alışkanlıklar")}</span>
                     <strong>{habitCompletion}</strong>
                     <small>{habitCountLabel}</small>
                 </div>
-                <div className="summary-card">
+                <div className={`summary-card ${styles.summaryCard}`}>
                     <span>{text("Bu ay aktiviteler")}</span>
                     <strong>{monthActivities}</strong>
                     <small>{text("Günlük aktivitelerin")}</small>

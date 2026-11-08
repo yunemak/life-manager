@@ -74,15 +74,15 @@ export default function FinancePage({
             </div>
 
             <div className={`summary-grid ${styles.compact}`}>
-                <div className="summary-card">
+                <div className={`summary-card ${styles.summaryCard}`}>
                     <span>{text("Bu ay gider")}</span>
                     <strong>{money(monthSpent)}</strong>
                 </div>
-                <div className="summary-card">
+                <div className={`summary-card ${styles.summaryCard}`}>
                     <span>{text("Bu ay gelir")}</span>
                     <strong>{money(monthIncome)}</strong>
                 </div>
-                <div className="summary-card">
+                <div className={`summary-card ${styles.summaryCard}`}>
                     <span>{text("Net durum")}</span>
                     <strong>{money(monthIncome - monthSpent)}</strong>
                 </div>
@@ -95,7 +95,7 @@ export default function FinancePage({
                             <h2>{text("Günlük harcamalar")}</h2>
                             <p>{monthLabel}</p>
                         </div>
-                        <div className="month-nav">
+                        <div>
                             <button
                                 aria-label={text("Önceki ay")}
                                 onClick={() =>

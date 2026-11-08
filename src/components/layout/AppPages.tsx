@@ -34,6 +34,8 @@ import { Empty, RecordList, RecordRow } from "../entries/EntryList";
 import JournalTasksPage from "../journal/JournalTasksPage";
 import StatisticsPage from "../statistics/StatisticsPage";
 import SettingsPage from "../settings/SettingsPage";
+import todayEntriesStyles from "../entries/TodayEntriesPage.module.css";
+import journalTasksStyles from "../journal/JournalTasksPage.module.css";
 
 const amountText = (minor: number) => money(minor);
 const balanceText = (minor: number) =>
@@ -283,6 +285,17 @@ export default function AppPages({
                         query={query}
                         setQuery={setQuery}
                         showTimestamp
+                        moduleClasses={{
+                            layout: todayEntriesStyles.recordListLayout,
+                            tools: todayEntriesStyles.listTools,
+                            list: todayEntriesStyles.recordList,
+                            row: todayEntriesStyles.recordRow,
+                            taskPriorityHigh:
+                                todayEntriesStyles.taskPriorityHigh,
+                            taskPriorityMedium:
+                                todayEntriesStyles.taskPriorityMedium,
+                            taskPriorityLow: todayEntriesStyles.taskPriorityLow,
+                        }}
                     />
                 </TodayEntriesPage>
             )}
@@ -371,6 +384,14 @@ export default function AppPages({
                         }}
                         query={query}
                         setQuery={setQuery}
+                        moduleClasses={
+                            page === "tasks"
+                                ? {
+                                      tools: journalTasksStyles.listTools,
+                                      row: journalTasksStyles.recordRow,
+                                  }
+                                : undefined
+                        }
                     />
                 </JournalTasksPage>
             )}

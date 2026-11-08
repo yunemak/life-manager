@@ -70,15 +70,15 @@
     height: 19px;
 }
 
-.root :global(.setting-panel) {
+.settingPanel {
     margin-bottom: 16px;
 }
 
-.root :global(.setting-panel > h2) {
+.settingPanel > h2 {
     margin: 0 0 12px;
 }
 
-.root :global(.setting-row) {
+.settingRow {
     min-height: 65px;
     border-top: 1px solid var(--line);
     display: flex;
@@ -87,22 +87,22 @@
     gap: 12px;
 }
 
-.root :global(.setting-row > div:first-child) {
+.settingRow > div:first-child {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.root :global(.setting-row b) {
+.settingRow b {
     font-size: 12px;
 }
 
-.root :global(.setting-row small) {
+.settingRow small {
     font-size: 10px;
     color: var(--muted);
 }
 
-.root :global(.choice-group) {
+.choiceGroup {
     display: flex;
     gap: 5px;
     background: var(--soft);
@@ -110,7 +110,7 @@
     border-radius: 8px;
 }
 
-.root :global(.choice-group button) {
+.choiceGroup button {
     border: 1px solid transparent;
     background: none;
     border-radius: 6px;
@@ -122,39 +122,39 @@
     color: var(--muted);
 }
 
-.root :global(.choice-group button.chosen) {
+.choiceGroup button.chosen {
     background: var(--panel);
     border-color: var(--line);
     color: var(--text);
 }
 
-.root :global(.setting-panel .choice-group button.chosen) {
+.settingPanel .choiceGroup button.chosen {
     border-color: color-mix(in srgb, var(--accent), transparent 55%);
     color: var(--accent);
 }
 
-.root :global(.dot) {
+.dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
 }
 
-.root :global(.green-dot) {
+.greenDot {
     background: #438a67;
 }
 
-.root :global(.blue-dot) {
+.blueDot {
     background: #467caf;
 }
 
-.root :global(.backup-actions) {
+.backupActions {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     margin: 15px 0;
 }
 
-.root :global(.drive-note) {
+.driveNote {
     display: flex;
     gap: 10px;
     background: var(--soft);
@@ -163,44 +163,44 @@
     color: var(--muted);
 }
 
-.root :global(.drive-note > span) {
+.driveNote > span {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.root :global(.drive-note b) {
+.driveNote b {
     font-size: 11px;
     color: var(--text);
 }
 
-.root :global(.drive-note small) {
+.driveNote small {
     font-size: 10px;
     line-height: 1.5;
 }
 
 @media (max-width: 650px) {
-    .root :global(.setting-row) {
+    .settingRow {
         align-items: flex-start;
         padding: 13px 0;
         flex-direction: column;
     }
 
-    .root :global(.choice-group button) {
+    .choiceGroup button {
         font-size: 10px;
     }
 
-    .root :global(.backup-actions) {
+    .backupActions {
         display: grid;
         grid-template-columns: 1fr;
     }
 
-    .root :global(.backup-actions button) {
+    .backupActions button {
         width: 100%;
     }
 }
 
-.root :global(.category-add-button) {
+.categoryAddButton {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -213,7 +213,7 @@
     color: var(--text);
 }
 
-.root :global(.category-add-button:hover) {
+.categoryAddButton:hover {
     border-color: var(--accent);
     color: var(--accent);
     background: var(--accent-light);

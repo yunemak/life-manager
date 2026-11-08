@@ -109,7 +109,7 @@ export default function SettingsPage({
     const text = (value: string) => t(value, language);
 
     return (
-        <div className={styles.root}>
+        <div>
             <div className="page-heading">
                 <div>
                     <div className="eyebrow">{text("SENİN UYGULAMAN")}</div>
@@ -117,9 +117,9 @@ export default function SettingsPage({
                     <p>{text("Görünümünü düzenle, verilerini koru.")}</p>
                 </div>
             </div>
-            <section className="panel setting-panel">
+            <section className={`panel ${styles.settingPanel}`}>
                 <h2>{text("Görünüm")}</h2>
-                <div className="setting-row">
+                <div className={styles.settingRow}>
                     <div>
                         <b>{language === "en" ? "Language" : "Dil"}</b>
                         <small>
@@ -128,57 +128,57 @@ export default function SettingsPage({
                                 : "Arayüz dilini seç."}
                         </small>
                     </div>
-                    <div className="choice-group">
+                    <div className={styles.choiceGroup}>
                         <button
-                            className={language === "en" ? "chosen" : ""}
+                            className={language === "en" ? styles.chosen : ""}
                             onClick={() => onLanguageChange("en")}
                         >
                             English
                         </button>
                         <button
-                            className={language === "tr" ? "chosen" : ""}
+                            className={language === "tr" ? styles.chosen : ""}
                             onClick={() => onLanguageChange("tr")}
                         >
                             {text("Türkçe")}
                         </button>
                     </div>
                 </div>
-                <div className="setting-row">
+                <div className={styles.settingRow}>
                     <div>
                         <b>{text("Renk teması")}</b>
                         <small>{text("Uygulamanın vurgu rengini seç.")}</small>
                     </div>
-                    <div className="choice-group">
+                    <div className={styles.choiceGroup}>
                         <button
-                            className={accent === "green" ? "chosen" : ""}
+                            className={accent === "green" ? styles.chosen : ""}
                             onClick={() => onAccentChange("green")}
                         >
-                            <i className="dot green-dot" />
+                            <i className={`${styles.dot} ${styles.greenDot}`} />
                             {text("Yeşil")}
                         </button>
                         <button
-                            className={accent === "blue" ? "chosen" : ""}
+                            className={accent === "blue" ? styles.chosen : ""}
                             onClick={() => onAccentChange("blue")}
                         >
-                            <i className="dot blue-dot" />
+                            <i className={`${styles.dot} ${styles.blueDot}`} />
                             {language === "en" ? "Blue" : "Mavi"}
                         </button>
                     </div>
                 </div>
-                <div className="setting-row">
+                <div className={styles.settingRow}>
                     <div>
                         <b>{text("Görünüm modu")}</b>
                         <small>{text("Açık veya koyu tema.")}</small>
                     </div>
-                    <div className="choice-group">
+                    <div className={styles.choiceGroup}>
                         <button
-                            className={theme === "light" ? "chosen" : ""}
+                            className={theme === "light" ? styles.chosen : ""}
                             onClick={() => onThemeChange("light")}
                         >
                             <Sun size={15} /> {text("Açık")}
                         </button>
                         <button
-                            className={theme === "dark" ? "chosen" : ""}
+                            className={theme === "dark" ? styles.chosen : ""}
                             onClick={() => onThemeChange("dark")}
                         >
                             <Moon size={15} />
@@ -187,14 +187,14 @@ export default function SettingsPage({
                     </div>
                 </div>
             </section>
-            <section className="panel setting-panel">
+            <section className={`panel ${styles.settingPanel}`}>
                 <h2>{language === "en" ? "Privacy" : "Gizlilik"}</h2>
                 <p className="subtle">
                     {text(
                         "Verilerin bu cihazda saklanır. Hesap gerekmez; dışarı aktararak yedekleyebilirsin.",
                     )}
                 </p>
-                <div className="backup-actions">
+                <div className={styles.backupActions}>
                     <button className="secondary" onClick={onExportJson}>
                         <Download size={17} /> {text("JSON yedeği indir")}
                     </button>
@@ -221,7 +221,7 @@ export default function SettingsPage({
                         <Download size={17} /> {text("Finans CSV indir")}
                     </button>
                 </div>
-                <div className="drive-note">
+                <div className={styles.driveNote}>
                     <Cloud size={18} />
                     <span>
                         <b>{text("Google Drive yedekleme")}</b>
@@ -233,7 +233,7 @@ export default function SettingsPage({
                     </span>
                 </div>
             </section>
-            <section className="panel setting-panel">
+            <section className={`panel ${styles.settingPanel}`}>
                 <h2>{text("Özel kategoriler")}</h2>
                 {categories.map((category) => (
                     <div
@@ -257,13 +257,13 @@ export default function SettingsPage({
                     </div>
                 ))}
                 <button
-                    className="secondary category-add-button"
+                    className={`secondary ${styles.categoryAddButton}`}
                     onClick={onAddCategory}
                 >
                     <Plus size={16} /> {text("Gider kategorisi ekle")}
                 </button>
             </section>
-            <section className="panel setting-panel">
+            <section className={`panel ${styles.settingPanel}`}>
                 <h2>{text("Gizlilik")}</h2>
                 <p className="subtle">
                     {text(

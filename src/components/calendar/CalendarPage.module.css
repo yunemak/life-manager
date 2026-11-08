@@ -1,29 +1,29 @@
-.root :global(.calendar-panel),
-.root :global(.calendar-report) {
+.calendarPanel,
+.calendarReport {
     width: 100%;
     max-width: 780px;
     margin-right: auto;
     margin-left: auto;
 }
 
-.root :global(.calendar-title) {
+.calendarTitle {
     margin: 7px 0 !important;
 }
 
-.root :global(.month-nav) {
+.monthNav {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.root :global(.month-nav b) {
+.monthNav b {
     min-width: 115px;
     text-align: center;
     text-transform: capitalize;
     font-size: 12px;
 }
 
-.root :global(.month-nav button) {
+.monthNav button {
     display: grid;
     width: 31px;
     height: 31px;
@@ -33,25 +33,25 @@
     background: var(--panel);
 }
 
-.root :global(.month-nav button svg) {
+.monthNav button svg {
     width: 16px;
 }
 
-.root :global(.calendar-grid) {
+.calendarGrid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 5px;
     margin: 21px 0;
 }
 
-.root :global(.weekday) {
+.weekday {
     padding: 8px;
     color: var(--muted);
     text-align: center;
     font-size: 10px;
 }
 
-.root :global(.calendar-day) {
+.calendarDay {
     position: relative;
     height: 48px;
     border: 0;
@@ -60,19 +60,19 @@
     font-size: 12px;
 }
 
-.root :global(.calendar-day:hover),
-.root :global(.calendar-day.selected) {
+.calendarDay:hover,
+.calendarDay.selected {
     background: var(--accent-light);
     color: var(--accent);
 }
 
-.root :global(.calendar-day.today) {
+.calendarDay.today {
     border: 1px solid var(--accent);
     color: var(--accent);
     font-weight: 750;
 }
 
-.root :global(.calendar-day i) {
+.calendarDay i {
     position: absolute;
     bottom: 6px;
     left: calc(50% - 2px);
@@ -82,44 +82,38 @@
     background: var(--accent);
 }
 
-.root :global(.day-heading) {
-    margin-bottom: 3px;
-    padding-top: 13px;
-    border-top: 1px solid var(--line);
-}
-
-.root :global(.calendar-report) {
+.calendarReport {
     margin-top: 22px;
     padding: 18px 21px 0;
     border-top: 1px solid var(--line);
 }
 
-.root :global(.calendar-report-heading) {
+.calendarReportHeading {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 15px;
 }
 
-.root :global(.calendar-report-heading h3) {
+.calendarReportHeading h3 {
     margin: 5px 0 3px;
     font-size: 17px;
 }
 
-.root :global(.calendar-report-heading p) {
+.calendarReportHeading p {
     margin: 0;
     color: var(--muted);
     font-size: 11px;
 }
 
-.root :global(.calendar-report-stats) {
+.calendarReportStats {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 9px;
     margin-bottom: 19px;
 }
 
-.root :global(.calendar-report-stats > div) {
+.calendarReportStats > div {
     display: flex;
     min-width: 0;
     flex-direction: column;
@@ -130,19 +124,19 @@
     background: var(--soft);
 }
 
-.root :global(.calendar-report-stats small),
-.root :global(.calendar-report-stats span) {
+.calendarReportStats small,
+.calendarReportStats span {
     color: var(--muted);
     font-size: 10px;
 }
 
-.root :global(.calendar-report-stats b) {
+.calendarReportStats b {
     overflow: hidden;
     font-size: 15px;
     text-overflow: ellipsis;
 }
 
-.root :global(.calendar-report-sections) {
+.calendarReportSections {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-rows: 1fr;
@@ -150,7 +144,7 @@
     gap: 16px;
 }
 
-.root :global(.calendar-report-sections > section) {
+.calendarReportSections > section {
     min-width: 0;
     padding: 14px;
     border: 1px solid var(--line);
@@ -158,7 +152,7 @@
     background: var(--panel);
 }
 
-.root :global(.calendar-report-sections h4) {
+.calendarReportSections h4 {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -166,13 +160,13 @@
     font-size: 12px;
 }
 
-.root :global(.calendar-report-sections h4 span) {
+.calendarReportSections h4 span {
     color: var(--muted);
     font-size: 10px;
     font-weight: 500;
 }
 
-.root :global(.calendar-report-row) {
+.calendarReportRow {
     display: flex;
     min-height: 39px;
     align-items: center;
@@ -182,27 +176,27 @@
     font-size: 11px;
 }
 
-.root :global(.calendar-report-row > i) {
+.calendarReportRow > i {
     width: 8px;
     height: 20px;
     flex: 0 0 auto;
     border-radius: 4px;
 }
 
-.root :global(.calendar-report-row > span) {
+.calendarReportRow > span {
     min-width: 0;
     flex: 1;
     overflow-wrap: anywhere;
 }
 
-.root :global(.calendar-report-row > b) {
+.calendarReportRow > b {
     color: var(--muted);
     text-align: right;
     font-size: 10px;
     font-weight: 550;
 }
 
-.root :global(.calendar-report-empty) {
+.calendarReportEmpty {
     margin: 0;
     padding: 8px 0;
     border-top: 1px solid var(--line);
@@ -210,16 +204,16 @@
     font-size: 10px;
 }
 
-.root :global(.calendar-report-sections .record-row) {
+.calendarReportSections .recordRow {
     padding: 7px 0;
 }
 
-.root :global(.calendar-report-sections .calendar-report-stats) {
+.calendarReportSections .calendarReportStats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     margin: 10px 0 0;
 }
 
-.root :global(.calendar-report-finance-totals) {
+.calendarReportFinanceTotals {
     display: flex;
     flex-wrap: wrap;
     gap: 8px 16px;
@@ -230,51 +224,51 @@
     font-size: 10px;
 }
 
-.root :global(.calendar-report-finance-totals b) {
+.calendarReportFinanceTotals b {
     margin-left: 4px;
     color: var(--text);
 }
 
 @media (max-width: 650px) {
-    .root :global(.calendar-day) {
+    .calendarDay {
         height: 41px;
     }
 
-    .root :global(.weekday) {
+    .weekday {
         padding: 6px 0;
         font-size: 9px;
     }
 
-    .root :global(.month-nav) {
+    .monthNav {
         gap: 5px;
     }
 
-    .root :global(.month-nav b) {
+    .monthNav b {
         min-width: 105px;
     }
 
-    .root :global(.calendar-report) {
+    .calendarReport {
         margin-right: 14px;
         margin-left: 14px;
         padding-right: 14px;
         padding-left: 14px;
     }
 
-    .root :global(.calendar-report-stats) {
+    .calendarReportStats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 7px;
     }
 
-    .root :global(.calendar-report-stats > div) {
+    .calendarReportStats > div {
         padding: 10px;
     }
 
-    .root :global(.calendar-report-sections) {
+    .calendarReportSections {
         grid-template-columns: 1fr;
         gap: 13px;
     }
 
-    .root :global(.calendar-report-heading h3) {
+    .calendarReportHeading h3 {
         font-size: 15px;
     }
 }

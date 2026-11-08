@@ -46,30 +46,30 @@
     width: 100%;
 }
 
-.recordsPanel :global(.record-list-layout) {
+.recordsPanel .recordListLayout {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.recordsPanel :global(.list-tools) {
+.recordsPanel .listTools {
     margin: 0;
 }
 
-.recordsPanel :global(.record-list) {
+.recordsPanel .recordList {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.recordsPanel :global(.record-row) {
+.recordsPanel .recordRow {
     min-height: 56px;
     align-items: center;
 }
 
-.recordsPanel :global(.record-row.task-priority-high),
-.recordsPanel :global(.record-row.task-priority-medium),
-.recordsPanel :global(.record-row.task-priority-low) {
+.recordsPanel .recordRow.taskPriorityHigh,
+.recordsPanel .recordRow.taskPriorityMedium,
+.recordsPanel .recordRow.taskPriorityLow {
     padding-left: 10px;
 }
 

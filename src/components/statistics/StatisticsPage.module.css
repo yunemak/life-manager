@@ -1,25 +1,25 @@
-.root :global(.stats-secondary) {
+.statsSecondary {
     align-items: stretch;
     margin-top: 17px;
 }
 
-.root :global(.stats-secondary .summary-card) {
+.summaryCard {
     height: 100%;
 }
 
-.root :global(.stats-secondary .summary-card > span) {
+.summaryCard > span {
     min-height: 2.5em;
     line-height: 1.25;
 }
 
-.root :global(.stats-secondary .summary-card > small) {
+.summaryCard > small {
     margin-top: auto;
     padding-top: 4px;
     line-height: 1.3;
 }
 
 @media (max-width: 650px) {
-    .root :global(.stats-secondary) {
+    .statsSecondary {
         margin-top: 12px;
     }
 }

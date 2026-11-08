@@ -12,6 +12,7 @@ import {
 } from "../../domain";
 import type { Language } from "../../i18n";
 import { RecordRow } from "../entries/EntryList";
+import styles from "./CalendarPage.module.css";
 
 export default function CalendarDayReport({
     date,
@@ -60,10 +61,10 @@ export default function CalendarDayReport({
     );
     return (
         <section
-            className="calendar-report"
+            className={styles.calendarReport}
             aria-label={label("Günlük rapor", "Daily report")}
         >
-            <header className="calendar-report-heading">
+            <header className={styles.calendarReportHeading}>
                 <div>
                     <div className="eyebrow">
                         {label("GÜNLÜK RAPOR", "DAILY REPORT")}
@@ -76,10 +77,10 @@ export default function CalendarDayReport({
                     </p>
                 </div>
             </header>
-            <div className="calendar-report-sections">
+            <div className={styles.calendarReportSections}>
                 <section>
                     <h4>{label("Genel Bakış", "Overview")}</h4>
-                    <div className="calendar-report-stats">
+                    <div className={styles.calendarReportStats}>
                         <div>
                             <small>{label("Kayıtlar", "Entries")}</small>
                             <b>{dayItems.length}</b>
@@ -116,19 +117,20 @@ export default function CalendarDayReport({
                                 item={item}
                                 categories={categories}
                                 language={language}
+                                className={styles.recordRow}
                                 onEdit={() => onEdit(item)}
                                 onDelete={() => onDelete(item)}
                             />
                         ))
                     ) : (
-                        <p className="calendar-report-empty">
+                        <p className={styles.calendarReportEmpty}>
                             {label(
                                 "Bu gün için finans kaydı yok.",
                                 "No finance entries for this day.",
                             )}
                         </p>
                     )}
-                    <div className="calendar-report-finance-totals">
+                    <div className={styles.calendarReportFinanceTotals}>
                         <span>
                             {label("Gelir", "Income")}{" "}
                             <b className="income-text">{money(income)}</b>
@@ -150,7 +152,10 @@ export default function CalendarDayReport({
                     </h4>
                     {journal.length ? (
                         journal.map((entry) => (
-                            <div className="calendar-report-row" key={entry.id}>
+                            <div
+                                className={styles.calendarReportRow}
+                                key={entry.id}
+                            >
                                 <FileText size={14} />
                                 <span>{entry.title}</span>
                                 <b>
@@ -161,7 +166,7 @@ export default function CalendarDayReport({
                             </div>
                         ))
                     ) : (
-                        <p className="calendar-report-empty">
+                        <p className={styles.calendarReportEmpty}>
                             {label(
                                 "Bu gün için günlük kaydı yok.",
                                 "No journal entries for this day.",
@@ -180,13 +185,14 @@ export default function CalendarDayReport({
                                 item={task}
                                 categories={categories}
                                 language={language}
+                                className={styles.recordRow}
                                 onEdit={() => onEdit(task)}
                                 onDelete={() => onDelete(task)}
                                 onToggleTask={() => onToggleTask(task)}
                             />
                         ))
                     ) : (
-                        <p className="calendar-report-empty">
+                        <p className={styles.calendarReportEmpty}>
                             {label(
                                 "Bu gün için görev yok.",
                                 "No tasks for this day.",
@@ -203,7 +209,10 @@ export default function CalendarDayReport({
                     </h4>
                     {habits.length ? (
                         habits.map((habit) => (
-                            <div className="calendar-report-row" key={habit.id}>
+                            <div
+                                className={styles.calendarReportRow}
+                                key={habit.id}
+                            >
                                 <i
                                     style={{
                                         background:
@@ -228,7 +237,7 @@ export default function CalendarDayReport({
                             </div>
                         ))
                     ) : (
-                        <p className="calendar-report-empty">
+                        <p className={styles.calendarReportEmpty}>
                             {label(
                                 "Aktif alışkanlık yok.",
                                 "No active habits.",
@@ -238,7 +247,7 @@ export default function CalendarDayReport({
                 </section>
                 <section>
                     <h4>{label("İstatistikler", "Statistics")}</h4>
-                    <div className="calendar-report-stats">
+                    <div className={styles.calendarReportStats}>
                         <div>
                             <small>{label("Gelir", "Income")}</small>
                             <b className="income-text">{money(income)}</b>

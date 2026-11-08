@@ -43,14 +43,14 @@ export default function CalendarPage({
             : ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 
     return (
-        <div className={styles.root}>
-            <section className="panel calendar-panel">
+        <div>
+            <section className={`panel ${styles.calendarPanel}`}>
                 <div className="panel-heading">
                     <div>
                         <div className="eyebrow">{eyebrow}</div>
-                        <h2 className="calendar-title">{title}</h2>
+                        <h2 className={styles.calendarTitle}>{title}</h2>
                     </div>
-                    <div className="month-nav">
+                    <div className={styles.monthNav}>
                         <button
                             aria-label={
                                 language === "en"
@@ -72,9 +72,9 @@ export default function CalendarPage({
                         </button>
                     </div>
                 </div>
-                <div className="calendar-grid">
+                <div className={styles.calendarGrid}>
                     {weekdays.map((weekday) => (
-                        <span className="weekday" key={weekday}>
+                        <span className={styles.weekday} key={weekday}>
                             {weekday}
                         </span>
                     ))}
@@ -90,7 +90,7 @@ export default function CalendarPage({
                         return (
                             <button
                                 onClick={() => onSelectDate(date)}
-                                className={`calendar-day ${date === today ? "today" : ""} ${selected ? "selected" : ""}`}
+                                className={`${styles.calendarDay} ${date === today ? styles.today : ""} ${selected ? styles.selected : ""}`}
                                 key={date}
                             >
                                 {index + 1}

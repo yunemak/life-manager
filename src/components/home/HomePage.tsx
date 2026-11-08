@@ -45,7 +45,7 @@ export default function HomePage({
     const text = (value: string) => t(value, language);
 
     return (
-        <div className={styles.root}>
+        <div>
             <div className="welcome">
                 <div>
                     <div className="eyebrow">{dateLabel}</div>
@@ -56,7 +56,10 @@ export default function HomePage({
                             : "Bugün kendin için neler yaptın?"}
                     </p>
                 </div>
-                <button className="primary desktop-add" onClick={onQuickAdd}>
+                <button
+                    className={`primary ${styles.desktopAdd}`}
+                    onClick={onQuickAdd}
+                >
                     <Plus size={18} /> {text("Hızlı ekle")}
                 </button>
             </div>

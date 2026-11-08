@@ -385,7 +385,7 @@ describe("finance workflow", () => {
         expect(
             screen.getByText("Send the report").closest(".record-row"),
         ).toHaveClass("task-priority-high");
-        expect(completeButton.closest(".tasks-panel")).toBeInTheDocument();
+        expect(completeButton.closest(".panel")).toBeInTheDocument();
         fireEvent.click(screen.getByText("Send the report"));
         await waitFor(async () =>
             expect((await db.tasks.get("task-completion"))?.completed).toBe(
@@ -617,19 +617,16 @@ describe("finance workflow", () => {
         await screen.findByText("Merhaba 👋");
         fireEvent.click(screen.getAllByRole("button", { name: "Takvim" })[0]);
         await screen.findByText("GÜNLÜK RAPOR");
-        const calendarPanel =
-            container.querySelector<HTMLElement>(".calendar-panel");
-        const dailyReport =
-            container.querySelector<HTMLElement>(".calendar-report");
+        const calendarPanel = container.querySelector<HTMLElement>(".panel");
+        const dailyReport = screen.getByRole("region", {
+            name: "Günlük rapor",
+        });
         expect(calendarPanel).not.toBeNull();
         expect(dailyReport).not.toBeNull();
         expect(calendarPanel).not.toContainElement(dailyReport);
-        const dateButton = Array.from(
-            container.querySelectorAll(".calendar-day"),
-        ).find(
-            (button) =>
-                button.textContent?.trim() ===
-                String(Number(yesterday.slice(-2))),
+        const dateButton = within(calendarPanel as HTMLElement).getByRole(
+            "button",
+            { name: String(Number(yesterday.slice(-2))) },
         );
         expect(dateButton).not.toBeNull();
         fireEvent.click(dateButton!);
@@ -639,7 +636,15 @@ describe("finance workflow", () => {
         expect(screen.getByText("Walk")).toBeInTheDocument();
         expect(screen.getAllByText("₺12,34").length).toBeGreaterThan(0);
         expect(screen.getAllByText("1/1").length).toBeGreaterThan(0);
-        fireEvent.click(container.querySelector(".calendar-day")!);
+        const anotherDate = within(calendarPanel as HTMLElement)
+            .getAllByRole("button")
+            .find(
+                (button) =>
+                    button !== dateButton &&
+                    /^\d+$/.test(button.textContent?.trim() ?? ""),
+            );
+        expect(anotherDate).not.toBe(dateButton);
+        fireEvent.click(anotherDate!);
         await waitFor(() =>
             expect(screen.queryByText("Coffee")).not.toBeInTheDocument(),
         );
@@ -803,10 +808,7 @@ describe("finance workflow", () => {
         const addExpenseCategory = screen.getByRole("button", {
             name: "Add expense category",
         });
-        expect(addExpenseCategory).toHaveClass(
-            "category-add-button",
-            "secondary",
-        );
+        expect(addExpenseCategory).toHaveClass("secondary");
         fireEvent.click(addExpenseCategory);
         let categoryDialog = screen.getByRole("dialog", {
             name: "Add expense category",

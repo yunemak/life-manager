@@ -1,8 +1,8 @@
-.compact :global(.summary-card) {
+.compact .summaryCard {
     min-height: 92px;
 }
 
-.compact :global(.summary-card strong) {
+.compact .summaryCard strong {
     margin-top: 9px;
 }
 
@@ -54,7 +54,7 @@
 }
 
 @media (max-width: 650px) {
-    .compact :global(.summary-card) {
+    .compact .summaryCard {
         min-height: 80px;
     }
 }
