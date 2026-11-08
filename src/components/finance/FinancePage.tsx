@@ -179,7 +179,7 @@ export default function FinancePage({
                         <p>{text("Gelir ve gider kayıtların")}</p>
                     </div>
                     <button className="secondary" onClick={onExportCsv}>
-                        <Download size={16} /> CSV indir
+                        <Download size={16} /> {text("CSV indir")}
                     </button>
                 </div>
                 {transactionList}

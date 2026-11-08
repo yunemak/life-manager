@@ -23,6 +23,51 @@ afterEach(async () => {
 });
 
 describe("finance workflow", () => {
+    it("sorts transaction history by entry time, newest first", async () => {
+        const date = localDate();
+        const timestamp = new Date().toISOString();
+
+        await db.transactions.bulkAdd([
+            {
+                id: "older-transaction",
+                kind: "expense",
+                amountMinor: 1000,
+                categoryId: "food",
+                description: "Morning transaction",
+                occurredAt: `${date}T09:15`,
+                localDate: date,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            },
+            {
+                id: "newer-transaction",
+                kind: "income",
+                amountMinor: 2000,
+                categoryId: "income",
+                description: "Evening transaction",
+                occurredAt: `${date}T18:45`,
+                localDate: date,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            },
+        ]);
+
+        const { container } = render(<App />);
+        await screen.findByText("Merhaba 👋");
+        fireEvent.click(screen.getAllByRole("button", { name: "Finans" })[0]);
+        await screen.findByText("Evening transaction");
+
+        const descriptions = Array.from(
+            container.querySelectorAll(
+                ".record-list .record-row .record-info b",
+            ),
+        ).map((element) => element.textContent);
+        expect(descriptions.slice(0, 2)).toEqual([
+            "Evening transaction",
+            "Morning transaction",
+        ]);
+    });
+
     it("creates expense and income, reflects real totals, edits and deletes records", async () => {
         vi.spyOn(window, "confirm").mockReturnValue(true);
         render(<App />);
@@ -72,6 +117,13 @@ describe("finance workflow", () => {
         fireEvent.click(screen.getAllByRole("button", { name: "Finans" })[0]);
         expect(
             await screen.findByText("Test market alışverişi"),
+        ).toBeInTheDocument();
+        const transactionRow = screen
+            .getByText("Test market alışverişi")
+            .closest(".record-row");
+        expect(transactionRow).not.toBeNull();
+        expect(
+            within(transactionRow as HTMLElement).getByText(/\d{2}:\d{2}/),
         ).toBeInTheDocument();
         expect(screen.getByText("Test gelir")).toBeInTheDocument();
         expect(screen.getAllByText("₺125,50").length).toBeGreaterThan(0);
@@ -527,7 +579,19 @@ describe("finance workflow", () => {
         expect(
             screen.getByText("Take control of your money"),
         ).toBeInTheDocument();
+        expect(
+            screen.getByRole("heading", { name: "Transaction history" }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText("Your income and expense records"),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: "Download CSV" }),
+        ).toBeInTheDocument();
         expect(screen.getByText("Expenses this month")).toBeInTheDocument();
+        expect(
+            screen.getByText("Daily spending in this month"),
+        ).toBeInTheDocument();
         fireEvent.click(
             screen.getByRole("button", { name: "Add quick entry" }),
         );

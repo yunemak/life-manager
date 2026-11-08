@@ -185,153 +185,19 @@
         padding: 13px 0;
         flex-direction: column;
     }
-}
 
-@media (max-width: 650px) {
     .root :global(.choice-group button) {
         font-size: 10px;
     }
-}
 
-@media (max-width: 650px) {
     .root :global(.backup-actions) {
         display: grid;
         grid-template-columns: 1fr;
     }
-}
 
-@media (max-width: 650px) {
     .root :global(.backup-actions button) {
         width: 100%;
     }
-}
-
-.root :global(.category-add-button) {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    margin-top: 12px;
-    padding: 9px 13px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 650;
-    color: var(--text);
-}
-
-.root :global(.category-add-button:hover) {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: var(--accent-light);
-}
-
-.root :global(.setting-panel) {
-    margin-bottom: 16px;
-}
-
-.root :global(.setting-panel > h2) {
-    margin: 0 0 12px;
-}
-
-.root :global(.setting-row) {
-    min-height: 65px;
-    border-top: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.root :global(.setting-row > div:first-child) {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.root :global(.setting-row b) {
-    font-size: 12px;
-}
-
-.root :global(.setting-row small) {
-    font-size: 10px;
-    color: var(--muted);
-}
-
-.root :global(.choice-group) {
-    display: flex;
-    gap: 5px;
-    background: var(--soft);
-    padding: 4px;
-    border-radius: 8px;
-}
-
-.root :global(.choice-group button) {
-    border: 1px solid transparent;
-    background: none;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 9px;
-    font-size: 10px;
-    color: var(--muted);
-}
-
-.root :global(.choice-group button.chosen) {
-    background: var(--panel);
-    border-color: var(--line);
-    color: var(--text);
-}
-
-.root :global(.setting-panel .choice-group button.chosen) {
-    border-color: color-mix(in srgb, var(--accent), transparent 55%);
-    color: var(--accent);
-}
-
-.root :global(.dot) {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-}
-
-.root :global(.green-dot) {
-    background: #438a67;
-}
-
-.root :global(.blue-dot) {
-    background: #467caf;
-}
-
-.root :global(.backup-actions) {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 15px 0;
-}
-
-.root :global(.drive-note) {
-    display: flex;
-    gap: 10px;
-    background: var(--soft);
-    border-radius: 9px;
-    padding: 13px;
-    color: var(--muted);
-}
-
-.root :global(.drive-note > span) {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.root :global(.drive-note b) {
-    font-size: 11px;
-    color: var(--text);
-}
-
-.root :global(.drive-note small) {
-    font-size: 10px;
-    line-height: 1.5;
 }
 
 .root :global(.category-add-button) {

@@ -613,11 +613,6 @@ button:disabled {
     color: var(--text);
     font-size: 11px;
 }
-.calendar-day.today {
-    font-weight: 750;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-}
 .habit-row {
     height: 55px;
     font-weight: 600;
@@ -838,9 +833,6 @@ button:disabled {
     .page-heading p {
         font-size: 12px;
     }
-    .desktop-add {
-        display: none;
-    }
     .summary-grid {
         gap: 9px;
         margin-bottom: 12px;
@@ -886,8 +878,6 @@ button:disabled {
     }
     .record-row {
         gap: 9px;
-    }
-    .record-row {
         --record-leading-size: 30px;
     }
     .record-info b {
@@ -956,34 +946,6 @@ button:disabled {
         padding: 0 10px;
         font-size: 10px;
         white-space: nowrap;
-    }
-    .calendar-day {
-        height: 41px;
-    }
-    .weekday {
-        font-size: 9px;
-        padding: 6px 0;
-    }
-    .month-nav {
-        gap: 5px;
-    }
-    .month-nav b {
-        min-width: 105px;
-    }
-    .setting-row {
-        align-items: flex-start;
-        padding: 13px 0;
-        flex-direction: column;
-    }
-    .choice-group button {
-        font-size: 10px;
-    }
-    .backup-actions {
-        display: grid;
-        grid-template-columns: 1fr;
-    }
-    .backup-actions button {
-        width: 100%;
     }
     .modal-backdrop {
         align-items: flex-end;
@@ -1114,151 +1076,10 @@ button:disabled {
         min-width: 60px;
     }
 }
-.calendar-report-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 15px;
-}
-.calendar-report-heading h3 {
-    margin: 5px 0 3px;
-    font-size: 17px;
-}
-.calendar-report-heading p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 11px;
-}
-.calendar-report-stats {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 9px;
-    margin-bottom: 19px;
-}
-.calendar-report-stats > div {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    min-width: 0;
-    padding: 12px;
-    border: 1px solid var(--line);
-    border-radius: 9px;
-    background: var(--soft);
-}
-.calendar-report-stats small,
-.calendar-report-stats span {
-    font-size: 10px;
-    color: var(--muted);
-}
-.calendar-report-stats b {
-    font-size: 15px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.calendar-report-sections {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-}
-.calendar-report-sections > section {
-    min-width: 0;
-}
-.calendar-report-sections h4 {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 0 0 8px;
-    font-size: 12px;
-}
-.calendar-report-sections h4 span {
-    color: var(--muted);
-    font-size: 10px;
-    font-weight: 500;
-}
-.calendar-report-row {
-    min-height: 39px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 0;
-    border-top: 1px solid var(--line);
-    font-size: 11px;
-}
-.calendar-report-row > i {
-    width: 8px;
-    height: 20px;
-    flex: 0 0 auto;
-    border-radius: 4px;
-}
-.calendar-report-row > span {
-    flex: 1;
-    min-width: 0;
-    overflow-wrap: anywhere;
-}
-.calendar-report-row > b {
-    font-size: 10px;
-    font-weight: 550;
-    color: var(--muted);
-    text-align: right;
-}
-.calendar-report-empty {
-    padding: 8px 0;
-    margin: 0;
-    border-top: 1px solid var(--line);
-    color: var(--muted);
-    font-size: 10px;
-}
-.calendar-report-sections .record-row {
-    padding: 7px 0;
-}
 @media (max-width: 650px) {
-    .calendar-report-stats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 7px;
-    }
-    .calendar-report-stats > div {
-        padding: 10px;
-    }
-    .calendar-report-sections {
-        grid-template-columns: 1fr;
-        gap: 13px;
-    }
-    .calendar-report-heading h3 {
-        font-size: 15px;
-    }
 }
 /* Keep the Statistics summary cards aligned even when their labels wrap. */
-.stats-secondary {
-    align-items: stretch;
-}
 @media (max-width: 650px) {
-    .stats-secondary {
-        margin-top: 12px;
-    }
-}
-.calendar-report-sections > section {
-    padding: 14px;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    background: var(--panel);
-}
-.calendar-report-sections .calendar-report-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin: 10px 0 0;
-}
-.calendar-report-finance-totals {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 16px;
-    padding-top: 10px;
-    margin-top: 8px;
-    border-top: 1px solid var(--line);
-    font-size: 10px;
-    color: var(--muted);
-}
-.calendar-report-finance-totals b {
-    margin-left: 4px;
-    color: var(--text);
 }
 .confirm-backdrop {
     align-items: center;
@@ -1308,22 +1129,7 @@ button:disabled {
     background: #cf4d48;
     color: #fff;
 }
-.calendar-report-sections {
-    align-items: stretch;
-    grid-auto-rows: 1fr;
-}
 @media (max-width: 650px) {
-    .calendar-report {
-        margin-left: 14px;
-        margin-right: 14px;
-    }
-}
-.calendar-panel,
-.calendar-report {
-    width: 100%;
-    max-width: 780px;
-    margin-left: auto;
-    margin-right: auto;
 }
 .category-dialog {
     width: min(100% - 32px, 420px);

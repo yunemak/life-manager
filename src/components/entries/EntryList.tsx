@@ -61,7 +61,13 @@ export function RecordList({
     showTimestamp?: boolean;
 }) {
     const list = finance
-        ? items.filter((i) => i.kind === "expense" || i.kind === "income")
+        ? items
+              .filter((i) => i.kind === "expense" || i.kind === "income")
+              .sort(
+                  (a, b) =>
+                      new Date(entryTimestamp(b)).getTime() -
+                      new Date(entryTimestamp(a)).getTime(),
+              )
         : items;
     const word = (trText: string, enText: string) =>
         language === "en" ? enText : trText;
