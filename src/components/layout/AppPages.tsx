@@ -246,8 +246,8 @@ export default function AppPages({
                         ) : (
                             <Empty
                                 icon={<Check />}
-                                title="Her şey yolunda"
-                                text="Bugün için bekleyen görevin yok."
+                                title={text("Her şey yolunda")}
+                                text={text("Bugün için bekleyen görevin yok.")}
                             />
                         )
                     }

@@ -103,7 +103,9 @@ export default function HomePage({
                     <div className="panel-heading">
                         <div>
                             <h2>{text("Yapılacaklar")}</h2>
-                            <p>{pendingTaskCount} tamamlanmamış görev</p>
+                            <p>
+                                {pendingTaskCount} {text("tamamlanmamış görev")}
+                            </p>
                         </div>
                         <button className="round-mini" onClick={onAddTask}>
                             <Plus size={17} />

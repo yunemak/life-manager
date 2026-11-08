@@ -673,6 +673,11 @@ describe("finance workflow", () => {
         fireEvent.click(
             screen.getByRole("button", { name: "Switch language to English" }),
         );
+        expect(
+            await screen.findByText("0 unfinished tasks"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("All caught up")).toBeInTheDocument();
+        expect(screen.getByText("No tasks pending today.")).toBeInTheDocument();
         const bottomNav = within(
             container.querySelector(".bottom-nav") as HTMLElement,
         );
