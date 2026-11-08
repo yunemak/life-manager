@@ -179,18 +179,20 @@ export default function CalendarDayReport({
                         {label("Görevler", "Tasks")} <span>{tasks.length}</span>
                     </h4>
                     {tasks.length ? (
-                        tasks.map((task) => (
-                            <RecordRow
-                                key={task.id}
-                                item={task}
-                                categories={categories}
-                                language={language}
-                                className={styles.recordRow}
-                                onEdit={() => onEdit(task)}
-                                onDelete={() => onDelete(task)}
-                                onToggleTask={() => onToggleTask(task)}
-                            />
-                        ))
+                        <div className={styles.calendarTaskList}>
+                            {tasks.map((task) => (
+                                <RecordRow
+                                    key={task.id}
+                                    item={task}
+                                    categories={categories}
+                                    language={language}
+                                    className={styles.recordRow}
+                                    onEdit={() => onEdit(task)}
+                                    onDelete={() => onDelete(task)}
+                                    onToggleTask={() => onToggleTask(task)}
+                                />
+                            ))}
+                        </div>
                     ) : (
                         <p className={styles.calendarReportEmpty}>
                             {label(

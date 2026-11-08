@@ -208,6 +208,16 @@
     padding: 7px 0;
 }
 
+.calendarTaskList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.calendarTaskList .recordRow {
+    padding-left: 10px;
+}
+
 .calendarReportSections .calendarReportStats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     margin: 10px 0 0;
